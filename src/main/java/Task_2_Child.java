@@ -12,6 +12,8 @@ public class Task_2_Child {
 
     public static void main(String[] args) throws Exception {
 
+        //
+
         long startTime = System.currentTimeMillis();
         System.out.println("Retrieving public client IP from checkip.amazonaws.com...");
         String publicClientIP = GeneralUtils.getPublicIP();

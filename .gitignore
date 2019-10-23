@@ -13,6 +13,8 @@ bin/
 /.vagrant/
 awsconfig
 /awsconfig
+dockerconfig
+/dockerconfig
 *.pem
 /src/main/java/META-INF/
 /src/main/resources/META-INF/

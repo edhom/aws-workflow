@@ -1,0 +1,6 @@
+#Template for "dockerconfig"
+#Duplicate this file and rename to "dockerconfig"
+#Enter your dockerHub_username and dockerHub_password for use with AWS
+
+dockerHub_username=
+dockerHub_password=

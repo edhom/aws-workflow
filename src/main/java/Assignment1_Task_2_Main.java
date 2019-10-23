@@ -5,7 +5,7 @@ import java.util.concurrent.*;
  * args[...]... InstanceType(s) (String) i.e. "t2.large t2.micro"
  */
 
-public class Task_2_Main {
+public class Assignment1_Task_2_Main {
     public static void main(final String[] args)throws Exception {
 
         ExecutorService executor = Executors.newCachedThreadPool();
@@ -21,7 +21,7 @@ public class Task_2_Main {
                 public Void call() throws Exception
                 {
                     String taskArgs[] = {arg, String.valueOf(finalChildID)};
-                    Task_2_Child.main(taskArgs);
+                    Assignment1_Task_2_Child.main(taskArgs);
                     return null;
                 }
             };

@@ -1,6 +1,0 @@
-#Template for "awsconfig"
-#Duplicate this file and rename to "awsconfig"
-#Enter your access_key_id and secret_access_key for use with AWS
-
-aws_access_key_id=
-aws_secret_access_key=

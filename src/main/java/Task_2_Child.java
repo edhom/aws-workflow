@@ -21,11 +21,11 @@ public class Task_2_Child {
         ec2Client = EC2Utils.getClient();
 
         //create new key pair
-        String newKeyPairName = "KeyPair_Homework_01_Bauer_Dzida.pem";
+        String newKeyPairName = "KeyPair3.pem";
         EC2Utils.createKeyPair(ec2Client, newKeyPairName);
 
         //create security group and add permissions
-        String newGroupName = "SecurityGroup_Homework_01_Bauer_Dzida";
+        String newGroupName = "SecurityGroup3";
         EC2Utils.createSecurityGroup(ec2Client, newGroupName, "Security Group for Homework 01.");
 
         //allow SSH
@@ -74,8 +74,8 @@ public class Task_2_Child {
         System.out.println("\n--- Cleaning up ---");
         //clean-up
         EC2Utils.terminateInstance(ec2Client, instanceID);
-        //EC2Utils.deleteSecurityGroup(ec2Client, newGroupName);
-        //EC2Utils.deleteKeyPair(ec2Client, newKeyPairName);
+        EC2Utils.deleteSecurityGroup(ec2Client, newGroupName);
+        EC2Utils.deleteKeyPair(ec2Client, newKeyPairName);
 
         long measuredTotalTime = System.currentTimeMillis() - startTime;
 

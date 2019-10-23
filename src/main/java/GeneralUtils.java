@@ -3,18 +3,22 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.lang.Object;
+import java.net.PasswordAuthentication;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 
 public class GeneralUtils {
 
-    public static BasicAWSCredentials loadCredentialsFromConfig() {
+    public static List<String> loadCredentialsFromConfig() {
         //Initialize variables
         InputStream config = null;
         String access_key_id = "";
         String aws_secret_access_key = "";
+        List returnData = new ArrayList();
 
         try
         {
@@ -33,6 +37,39 @@ public class GeneralUtils {
             //get id and secret
             access_key_id = prop.getProperty("aws_access_key_id");
             aws_secret_access_key = prop.getProperty("aws_secret_access_key");
+            returnData.add(access_key_id);
+            returnData.add(aws_secret_access_key);
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        return returnData;
+    }
+
+    public static BasicAWSCredentials loadDockerAccessDataFromConfig() {
+        //Initialize variables
+        InputStream config = null;
+        String access_key_id = "";
+        String aws_secret_access_key = "";
+
+        try
+        {
+            // load a awsconfig file
+            config = new FileInputStream("dockerconfig");
+
+            if (config == null) {
+                System.out.println("Unable to find dockerconfig file. Exiting program...");
+                System.exit(1);
+            }
+
+            Properties prop = new Properties();
+
+            prop.load(config);
+
+            //get id and secret
+            access_key_id = prop.getProperty("dockerHub_username");
+            aws_secret_access_key = prop.getProperty("dockerHub_password");
 
         } catch (IOException ex) {
             ex.printStackTrace();

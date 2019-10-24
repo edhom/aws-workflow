@@ -19,11 +19,11 @@ public class Assignment2_Task1 {
         ec2Client = EC2Utils.getClient();
 
         //create new key pair
-        String newKeyPairName = "KeyPair3.pem";
+        String newKeyPairName = "KeyPair5.pem";
         EC2Utils.createKeyPair(ec2Client, newKeyPairName);
 
         //create security group and add permissions
-        String newGroupName = "SecurityGroup3";
+        String newGroupName = "SecurityGroup5";
         EC2Utils.createSecurityGroup(ec2Client, newGroupName, "Security Group for Homework 02.");
 
         //allow SSH
@@ -65,7 +65,7 @@ public class Assignment2_Task1 {
         SSHUtils.executeCMD(sshClient, dockerPullCommand, 600);
 
         //upload CSV File
-        SSHUtils.SCPUpload(sshClient, "input_full.csv", "/src");
+        SSHUtils.SCPUpload(sshClient, "input_full.csv", "/tmp");
 
         //Docker execute jar File
         String dockerExeCommand = "sudo docker run -v $(pwd):/src -it " + dockerHubLoginData.get(0) + "/calc_fib:new";

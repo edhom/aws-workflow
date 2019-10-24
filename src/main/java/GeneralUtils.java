@@ -1,3 +1,4 @@
+import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 
 import java.io.*;
@@ -13,12 +14,11 @@ import java.util.concurrent.TimeUnit;
 
 public class GeneralUtils {
 
-    public static List<String> loadCredentialsFromConfig() {
+    public static BasicAWSCredentials loadCredentialsFromConfig() {
         //Initialize variables
         InputStream config = null;
         String access_key_id = "";
         String aws_secret_access_key = "";
-        List returnData = new ArrayList();
 
         try
         {
@@ -37,21 +37,20 @@ public class GeneralUtils {
             //get id and secret
             access_key_id = prop.getProperty("aws_access_key_id");
             aws_secret_access_key = prop.getProperty("aws_secret_access_key");
-            returnData.add(access_key_id);
-            returnData.add(aws_secret_access_key);
 
         } catch (IOException ex) {
             ex.printStackTrace();
         }
 
-        return returnData;
+        return new BasicAWSCredentials(access_key_id, aws_secret_access_key);
     }
 
-    public static BasicAWSCredentials loadDockerAccessDataFromConfig() {
+    public static List<String> loadDockerAccessDataFromConfig() {
         //Initialize variables
         InputStream config = null;
         String access_key_id = "";
         String aws_secret_access_key = "";
+        List<String> returnData = new ArrayList();
 
         try
         {
@@ -70,12 +69,14 @@ public class GeneralUtils {
             //get id and secret
             access_key_id = prop.getProperty("dockerHub_username");
             aws_secret_access_key = prop.getProperty("dockerHub_password");
+            returnData.add(access_key_id);
+            returnData.add(aws_secret_access_key);
 
         } catch (IOException ex) {
             ex.printStackTrace();
         }
 
-        return new BasicAWSCredentials(access_key_id, aws_secret_access_key);
+        return returnData;
     }
 
     public static String getPublicIP()

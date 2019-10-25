@@ -19,11 +19,11 @@ public class Assignment2_Task1 {
         ec2Client = EC2Utils.getClient();
 
         //create new key pair
-        String newKeyPairName = "KeyPair3.pem";
+        String newKeyPairName = "KeyPair6.pem";
         EC2Utils.createKeyPair(ec2Client, newKeyPairName);
 
         //create security group and add permissions
-        String newGroupName = "SecurityGroup3";
+        String newGroupName = "SecurityGroup6";
         EC2Utils.createSecurityGroup(ec2Client, newGroupName, "Security Group for Homework 02.");
 
         //allow SSH
@@ -45,6 +45,10 @@ public class Assignment2_Task1 {
         HashMap<String, String> publicDNSIP = EC2Utils.getPublicIPandDNS(ec2Client, instanceID);
 
         SSHClient sshClient = SSHUtils.connectSSH(publicDNSIP.get("DNS"), "ec2-user", newKeyPairName);
+        SSHUtils.executeCMD(sshClient, "pwd", 600);
+
+        //upload CSV File
+        SSHUtils.SCPUpload(sshClient, "input_full.csv", "/home/ec2-user");
 
         //Install Docker
         System.out.println("Installing Docker:");
@@ -61,20 +65,14 @@ public class Assignment2_Task1 {
         SSHUtils.executeCMD(sshClient, dockerLoginCommand, 600);
 
         //Docker pull image
-        String dockerPullCommand = "sudo docker pull " + dockerHubLoginData.get(0) + "/calc_fib:new";
+        String dockerPullCommand = "sudo docker pull " + dockerHubLoginData.get(0) + "/calc_fib:2";
         SSHUtils.executeCMD(sshClient, dockerPullCommand, 600);
 
-        //upload CSV File
-        SSHUtils.SCPUpload(sshClient, "input_full.csv", "/src");
 
         //Docker execute jar File
-        String dockerExeCommand = "sudo docker run -v $(pwd):/src -it " + dockerHubLoginData.get(0) + "/calc_fib:new";
+        String dockerExeCommand = "sudo docker run -v $(pwd):/src -it " + dockerHubLoginData.get(0) + "/calc_fib:2";
 
-        //Upload Input File
-        long uploadStartTime = System.currentTimeMillis();
-        SSHUtils.SCPUpload(sshClient, "input_" + args[1] + ".csv", "/tmp");
-        SSHUtils.SCPUpload(sshClient, "calc_fib.jar", "/tmp");
-        long uploadTime = System.currentTimeMillis() - uploadStartTime;
+        SSHUtils.executeCMD(sshClient, dockerExeCommand, 600);
 
     }
 }

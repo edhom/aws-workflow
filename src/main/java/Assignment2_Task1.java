@@ -19,11 +19,11 @@ public class Assignment2_Task1 {
         ec2Client = EC2Utils.getClient();
 
         //create new key pair
-        String newKeyPairName = "KeyPair6.pem";
+        String newKeyPairName = "KeyPair3.pem";
         EC2Utils.createKeyPair(ec2Client, newKeyPairName);
 
         //create security group and add permissions
-        String newGroupName = "SecurityGroup6";
+        String newGroupName = "SecurityGroup3";
         EC2Utils.createSecurityGroup(ec2Client, newGroupName, "Security Group for Homework 02.");
 
         //allow SSH

@@ -61,7 +61,7 @@ public class Assignment2_Task1 {
 
         //Docker login
         List<String> dockerHubLoginData = GeneralUtils.loadDockerAccessDataFromConfig();
-        String dockerLoginCommand = "sudo docker login --username "+ dockerHubLoginData.get(0) + " --password " + dockerHubLoginData.get(1);
+        String dockerLoginCommand = "sudo docker login --username='"+ dockerHubLoginData.get(0) + "'" + " --password='" + dockerHubLoginData.get(1) + "'";
         SSHUtils.executeCMD(sshClient, dockerLoginCommand, 600);
 
         //Docker pull image
@@ -75,6 +75,12 @@ public class Assignment2_Task1 {
 
         //Download result
         SSHUtils.SCPDownload(sshClient,"/home/ec2-user/output.csv"  , "./output.csv");
+
+        System.out.println("\n--- Cleaning up ---");
+        //clean-up
+        EC2Utils.terminateInstance(ec2Client, instanceID);
+        EC2Utils.deleteSecurityGroup(ec2Client, newGroupName);
+        EC2Utils.deleteKeyPair(ec2Client, newKeyPairName);
 
     }
 }

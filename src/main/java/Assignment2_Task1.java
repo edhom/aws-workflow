@@ -1,10 +1,5 @@
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
-import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.core.DefaultDockerClientConfig;
-import com.github.dockerjava.core.DockerClientBuilder;
-import com.github.dockerjava.core.DockerClientConfig;
-import com.github.dockerjava.core.command.BuildImageResultCallback;
 import net.schmizz.sshj.SSHClient;
 
 import java.io.File;
@@ -65,12 +60,12 @@ public class Assignment2_Task1 {
         long dockerTime = System.currentTimeMillis() - dockerStartTime;
 
         //Docker start and login
-        long dockerLoginStarttime = System.currentTimeMillis() - dockerStartTime;
+        long dockerLoginStartTime = System.currentTimeMillis();
         SSHUtils.executeCMD(sshClient, "sudo service docker start", 600);
         List<String> dockerHubLoginData = GeneralUtils.loadDockerAccessDataFromConfig();
         String dockerLoginCommand = "sudo docker login --username='"+ dockerHubLoginData.get(0) + "'" + " --password='" + dockerHubLoginData.get(1) + "'";
         SSHUtils.executeCMD(sshClient, dockerLoginCommand, 600);
-        long dockerLoginTime = System.currentTimeMillis() - dockerLoginStarttime;
+        long dockerLoginTime = System.currentTimeMillis() - dockerLoginStartTime;
 
         //Docker pull image
         long pullingImageStartTime = System.currentTimeMillis();
@@ -98,7 +93,7 @@ public class Assignment2_Task1 {
         long measuredTotalTime = System.currentTimeMillis() - startTime;
 
         System.out.println("\n---------------------------");
-        System.out.println("Finished Computation - TIME MEASUREMENTS(" + instanceType + "; Child ID: " + args[1] + "; VM ID:" + instanceID + ")");
+        System.out.println("Finished Computation - TIME MEASUREMENTS");
         System.out.println("VM Startup: " + launchTime + " MS = " + launchTime/1000 + " S");
         System.out.println("Docker Installation: " + dockerTime + " MS = " + dockerTime/1000 + " S");
         System.out.println("Docker start and login: " + dockerLoginTime + " MS = " + dockerLoginTime/1000 + " S");

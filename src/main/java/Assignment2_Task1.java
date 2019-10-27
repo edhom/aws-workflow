@@ -1,7 +1,13 @@
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.core.DefaultDockerClientConfig;
+import com.github.dockerjava.core.DockerClientBuilder;
+import com.github.dockerjava.core.DockerClientConfig;
+import com.github.dockerjava.core.command.BuildImageResultCallback;
 import net.schmizz.sshj.SSHClient;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -52,35 +58,60 @@ public class Assignment2_Task1 {
 
         //Install Docker
         System.out.println("Installing Docker:");
-        long javaStartTime = System.currentTimeMillis();
+        long dockerStartTime = System.currentTimeMillis();
         SSHUtils.executeCMD(sshClient, "sudo yum update -y", 600);
         SSHUtils.executeCMD(sshClient, "sudo amazon-linux-extras install docker", 600);
-        SSHUtils.executeCMD(sshClient, "y", 600);
-        SSHUtils.executeCMD(sshClient, "sudo service docker start", 600);
-        long javaTime = System.currentTimeMillis() - javaStartTime;
+        //SSHUtils.executeCMD(sshClient, "y", 600);
+        long dockerTime = System.currentTimeMillis() - dockerStartTime;
 
-        //Docker login
+        //Docker start and login
+        long dockerLoginStarttime = System.currentTimeMillis() - dockerStartTime;
+        SSHUtils.executeCMD(sshClient, "sudo service docker start", 600);
         List<String> dockerHubLoginData = GeneralUtils.loadDockerAccessDataFromConfig();
         String dockerLoginCommand = "sudo docker login --username='"+ dockerHubLoginData.get(0) + "'" + " --password='" + dockerHubLoginData.get(1) + "'";
         SSHUtils.executeCMD(sshClient, dockerLoginCommand, 600);
+        long dockerLoginTime = System.currentTimeMillis() - dockerLoginStarttime;
 
         //Docker pull image
+        long pullingImageStartTime = System.currentTimeMillis();
         String dockerPullCommand = "sudo docker pull " + dockerHubLoginData.get(0) + "/calc_fib:4";
         SSHUtils.executeCMD(sshClient, dockerPullCommand, 600);
-
+        long pullingImageTime = System.currentTimeMillis() - pullingImageStartTime;
 
         //Docker execute jar File
+        long runtimeImageStartTime = System.currentTimeMillis();
         String dockerExeCommand = "sudo docker run -v $(pwd):/src " + dockerHubLoginData.get(0) + "/calc_fib:4";
         SSHUtils.executeCMD(sshClient, dockerExeCommand, 600);
+        long runtimeImage = System.currentTimeMillis() - runtimeImageStartTime;
 
         //Download result
+        long downloadResultStartTime= System.currentTimeMillis();
         SSHUtils.SCPDownload(sshClient,"/home/ec2-user/output.csv"  , "./output.csv");
+        long downloadResultTime = System.currentTimeMillis() - downloadResultStartTime;
 
         System.out.println("\n--- Cleaning up ---");
         //clean-up
         EC2Utils.terminateInstance(ec2Client, instanceID);
         EC2Utils.deleteSecurityGroup(ec2Client, newGroupName);
         EC2Utils.deleteKeyPair(ec2Client, newKeyPairName);
+
+        long measuredTotalTime = System.currentTimeMillis() - startTime;
+
+        System.out.println("\n---------------------------");
+        System.out.println("Finished Computation - TIME MEASUREMENTS(" + instanceType + "; Child ID: " + args[1] + "; VM ID:" + instanceID + ")");
+        System.out.println("VM Startup: " + launchTime + " MS = " + launchTime/1000 + " S");
+        System.out.println("Docker Installation: " + dockerTime + " MS = " + dockerTime/1000 + " S");
+        System.out.println("Docker start and login: " + dockerLoginTime + " MS = " + dockerLoginTime/1000 + " S");
+        System.out.println("Pull from Docker Hub: " + pullingImageTime + " MS = " + pullingImageTime/1000 + " S");
+        System.out.println("Runtime of Image: " + runtimeImage + " MS = " + runtimeImage/1000 + " S");
+        System.out.println("Download result: " + downloadResultTime + " MS = " + downloadResultTime/1000 + " S");
+        System.out.println("---------------------------");
+        long sumTime = launchTime + dockerTime + pullingImageTime + runtimeImage + downloadResultTime;
+        System.out.println("Sum of Times: " + sumTime + " MS = " + sumTime/1000 + " S");
+        System.out.println("Total Time Measured (i.e. +waiting time): " + measuredTotalTime + " MS = " + measuredTotalTime/1000 + " S");
+
+        sshClient.disconnect();
+        sshClient.close();
 
     }
 }

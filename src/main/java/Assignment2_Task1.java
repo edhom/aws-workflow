@@ -19,11 +19,11 @@ public class Assignment2_Task1 {
         ec2Client = EC2Utils.getClient();
 
         //create new key pair
-        String newKeyPairName = "KeyPair3.pem";
+        String newKeyPairName = "KeyPair7.pem";
         EC2Utils.createKeyPair(ec2Client, newKeyPairName);
 
         //create security group and add permissions
-        String newGroupName = "SecurityGroup3";
+        String newGroupName = "SecurityGroup7";
         EC2Utils.createSecurityGroup(ec2Client, newGroupName, "Security Group for Homework 02.");
 
         //allow SSH
@@ -65,14 +65,16 @@ public class Assignment2_Task1 {
         SSHUtils.executeCMD(sshClient, dockerLoginCommand, 600);
 
         //Docker pull image
-        String dockerPullCommand = "sudo docker pull " + dockerHubLoginData.get(0) + "/calc_fib:2";
+        String dockerPullCommand = "sudo docker pull " + dockerHubLoginData.get(0) + "/calc_fib:4";
         SSHUtils.executeCMD(sshClient, dockerPullCommand, 600);
 
 
         //Docker execute jar File
-        String dockerExeCommand = "sudo docker run -v $(pwd):/src -it " + dockerHubLoginData.get(0) + "/calc_fib:2";
-
+        String dockerExeCommand = "sudo docker run -v $(pwd):/src " + dockerHubLoginData.get(0) + "/calc_fib:4";
         SSHUtils.executeCMD(sshClient, dockerExeCommand, 600);
+
+        //Download result
+        SSHUtils.SCPDownload(sshClient,"/home/ec2-user/output.csv"  , "./output.csv");
 
     }
 }

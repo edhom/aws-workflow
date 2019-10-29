@@ -1,5 +1,7 @@
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.model.Info;
 import net.schmizz.sshj.SSHClient;
 
 import java.io.File;
@@ -12,6 +14,28 @@ public class Assignment2_Task1 {
     @SuppressWarnings("Duplicates")
     public static void main(String[] args) throws InterruptedException, IOException {
         long startTime = System.currentTimeMillis();
+        DockerClient dockerClient = DockerUtils.loadDockerDefaultConfig();
+        Info info = dockerClient.infoCmd().exec();
+
+        String dockerFile = "./src/main/java/H02/dockerfile";
+        String imageName = "calcfib";
+        String repository = "h02";
+
+        String fullImageTag = DockerUtils.getFullImgTag(dockerClient, repository, imageName);
+
+        long measuredTotalTimeStart = System.currentTimeMillis();
+
+        //Build Image
+        long imgBuildStartTime = System.currentTimeMillis();
+        DockerUtils.buildImgFromDockerfile(dockerClient, dockerFile, fullImageTag);
+        long imgBuildTime = System.currentTimeMillis() - imgBuildStartTime;
+
+        //Push Image to Docker Hub
+        long imgPushStartTime = System.currentTimeMillis();
+        DockerUtils.pushImgToDockerHub(dockerClient, repository, imageName);
+        long imgPushTime = System.currentTimeMillis() - imgPushStartTime;
+
+
         System.out.println("Retrieving public client IP from checkip.amazonaws.com...");
         String publicClientIP = GeneralUtils.getPublicIP();
         System.out.println("Public Client IP: " + publicClientIP);
@@ -20,11 +44,11 @@ public class Assignment2_Task1 {
         ec2Client = EC2Utils.getClient();
 
         //create new key pair
-        String newKeyPairName = "KeyPair7.pem";
+        String newKeyPairName = "KeyPair8.pem";
         EC2Utils.createKeyPair(ec2Client, newKeyPairName);
 
         //create security group and add permissions
-        String newGroupName = "SecurityGroup7";
+        String newGroupName = "SecurityGroup8";
         EC2Utils.createSecurityGroup(ec2Client, newGroupName, "Security Group for Homework 02.");
 
         //allow SSH

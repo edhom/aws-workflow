@@ -5,6 +5,12 @@ import com.amazonaws.services.rds.model.IPRange;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -48,7 +54,6 @@ public class EC2Utils {
         createKeyPairRequest.withKeyName(keyName);
 
         CreateKeyPairResult createKeyPairResult = null;
-
         try {
             createKeyPairResult = ec2Client.createKeyPair(createKeyPairRequest);
             System.out.println("Key Pair '" + keyName + "' successfully created...");
@@ -57,7 +62,17 @@ public class EC2Utils {
 
             //create keypair file, needed for ssh access
             String privateKey = keyPair.getKeyMaterial();
-            File keyFile = new File(keyName);
+            File keyFile;
+            //if UNIX, set Posix File Permissions to 600
+            if (!System.getProperty("os.name").startsWith("Windows")) {
+                Set<PosixFilePermission> ownerWritable = PosixFilePermissions.fromString("rw-------");
+                FileAttribute<?> permissions = PosixFilePermissions.asFileAttribute(ownerWritable);
+                Path path = Paths.get(keyName);
+                keyFile = Files.createFile(path, permissions).toFile();
+            } else {
+                keyFile = new File(keyName);
+            }
+
             FileWriter fw = new FileWriter(keyFile);
             fw.write(privateKey);
             fw.close();

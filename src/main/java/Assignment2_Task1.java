@@ -14,27 +14,6 @@ public class Assignment2_Task1 {
     @SuppressWarnings("Duplicates")
     public static void main(String[] args) throws InterruptedException, IOException {
         long startTime = System.currentTimeMillis();
-        DockerClient dockerClient = DockerUtils.loadDockerDefaultConfig();
-        Info info = dockerClient.infoCmd().exec();
-
-        String dockerFile = "./src/main/java/H02/dockerfile";
-        String imageName = "calcfib";
-        String repository = "h02";
-
-        String fullImageTag = DockerUtils.getFullImgTag(dockerClient, repository, imageName);
-
-        long measuredTotalTimeStart = System.currentTimeMillis();
-
-        //Build Image
-        long imgBuildStartTime = System.currentTimeMillis();
-        DockerUtils.buildImgFromDockerfile(dockerClient, dockerFile, fullImageTag);
-        long imgBuildTime = System.currentTimeMillis() - imgBuildStartTime;
-
-        //Push Image to Docker Hub
-        long imgPushStartTime = System.currentTimeMillis();
-        DockerUtils.pushImgToDockerHub(dockerClient, repository, imageName);
-        long imgPushTime = System.currentTimeMillis() - imgPushStartTime;
-
 
         System.out.println("Retrieving public client IP from checkip.amazonaws.com...");
         String publicClientIP = GeneralUtils.getPublicIP();

@@ -20,19 +20,29 @@ public class SSHUtils {
         //connect session
         System.out.println("Connecting via SSH to '" + publicDNS + "' with user '" + user + "' and key file '" + keyName + "'");
 
-        //Connecting with SSH
-       // boolean connectionSuccess = false;
-        //hile(!connectionSuccess){
-            //connectionSuccess = true;
-            try{
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            try {
                 ssh.connect(publicDNS);
-            }
-            catch (Exception e){
-                //connectionSuccess = false;
+            } catch (Exception e) {
+
                 System.out.println("Connection failed - trying again...");
                 e.printStackTrace();
             }
-        //}
+        } else { // On Unix, continue trying
+            boolean connectionSuccess = false;
+            while(!connectionSuccess){
+                connectionSuccess = true;
+                try{
+                    ssh.connect(publicDNS);
+                }
+                catch (Exception e){
+                    connectionSuccess = false;
+                    System.out.println("Connection failed - trying again...");
+                    e.printStackTrace();
+                }
+            }
+        }
+
         System.out.println("Connection successful...");
 
         //authenticate with private key file

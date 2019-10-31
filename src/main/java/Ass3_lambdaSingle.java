@@ -4,11 +4,14 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 
 import java.math.BigInteger;
 
-public class Assignment3 implements RequestHandler<Integer, String> {
-    public String handleRequest(Integer myCount, Context context) {
-        String result = fib(myCount).toString();
-        LambdaLogger logger = context.getLogger();
-        logger.log("calculated : " + result);
+public class Ass3_lambdaSingle implements RequestHandler<int[], BigInteger[]> {
+    public BigInteger[] handleRequest(int[] input, Context context) {
+        BigInteger[] result = new BigInteger[10];
+        for (int i = 0; i < 10; i++) {
+            result[i] = fib(input[i]);
+            LambdaLogger logger = context.getLogger();
+            logger.log("calculated: " + result[i]);
+        }
         return result;
     }
 

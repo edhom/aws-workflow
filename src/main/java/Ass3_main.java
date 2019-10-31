@@ -4,6 +4,7 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.lambda.AWSLambda;
 import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
 import com.amazonaws.services.lambda.invoke.LambdaInvokerFactory;
+import org.apache.log4j.BasicConfigurator;
 
 import java.math.BigInteger;
 /*
@@ -35,7 +36,7 @@ public class Ass3_main {
 
 public class Ass3_main {
     public static void main(String[] args) {
-
+        BasicConfigurator.configure();
         BasicAWSCredentials awsCredentials = GeneralUtils.loadCredentialsFromConfig();
         AWSLambda awsLambda = AWSLambdaClientBuilder
                 .standard()
@@ -47,7 +48,7 @@ public class Ass3_main {
                 .lambdaClient(awsLambda)
                 .build(Ass3_lambdaSingleService.class);
 
-        String input = "[0,1,2,3,4,5,6,7,8,9]";
+        int[] input = {0,1,2,3,4,5,6,7,8,9};
         BigInteger[] result = lambdaService.calc_fib(input);
     }
 }

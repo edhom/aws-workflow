@@ -11,7 +11,7 @@ import java.math.BigInteger;
 public class Ass3_main {
     public static void main(String[] args) {
         InvokeRequest invokeRequest = new InvokeRequest()
-                .withFunctionName("Fibonacchi")
+                .withFunctionName("Fibonacci")
                 .withPayload("[0,1,2,3,4,5,6,7,8,9]");
 
         BasicAWSCredentials awsCredentials = GeneralUtils.loadCredentialsFromConfig();

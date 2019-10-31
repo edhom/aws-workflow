@@ -37,9 +37,11 @@ public class Ass3_main {
     public static void main(String[] args) {
 
         BasicAWSCredentials awsCredentials = GeneralUtils.loadCredentialsFromConfig();
-        AWSLambda awsLambda = AWSLambdaClientBuilder.standard()
+        AWSLambda awsLambda = AWSLambdaClientBuilder
+                .standard()
                 .withRegion(Regions.EU_CENTRAL_1)
-                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials)).build();
+                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                .build();
 
         final Ass3_lambdaSingleService lambdaService = LambdaInvokerFactory.builder()
                 .lambdaClient(awsLambda)

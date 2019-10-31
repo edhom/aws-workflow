@@ -1,10 +1,7 @@
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
-import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.model.Info;
 import net.schmizz.sshj.SSHClient;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;

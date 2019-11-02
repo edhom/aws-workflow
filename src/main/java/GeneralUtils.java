@@ -2,12 +2,14 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.lang.Object;
 import java.net.PasswordAuthentication;
+import java.util.StringJoiner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -143,6 +145,14 @@ public class GeneralUtils {
         {
             splitCSV.add((ArrayList<String>)fullCSV.subList(fromIndex, allLines));
         }
+    }
+
+    public static String ArrayToString(BigInteger[] arr) {
+        StringJoiner join = new StringJoiner(", ");
+        for (BigInteger x : arr) {
+            join.add(x.toString());
+        }
+        return "[" + join.toString() + "]";
     }
 
 }

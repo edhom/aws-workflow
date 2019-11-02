@@ -7,36 +7,12 @@ import com.amazonaws.services.lambda.invoke.LambdaInvokerFactory;
 import org.apache.log4j.BasicConfigurator;
 
 import java.math.BigInteger;
-/*
-public class Ass3_main {
-    public static void main(String[] args) {
-        InvokeRequest invokeRequest = new InvokeRequest()
-                .withFunctionName("Fibonacci")
-                .withPayload("[0,1,2,3,4,5,6,7,8,9]");
 
-        BasicAWSCredentials awsCredentials = GeneralUtils.loadCredentialsFromConfig();
-
-        AWSLambda awsLambda = AWSLambdaClientBuilder.standard()
-                .withRegion(Regions.EU_CENTRAL_1)
-                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials)).build();
-
-        InvokeResult invokeResult = null;
-
-        try {
-            invokeResult = awsLambda.invoke(invokeRequest);
-        }
-        catch (Exception e) {
-            System.out.println(e);
-        }
-
-        System.out.println(invokeResult.getStatusCode());
-    }
-}
-*/
 
 public class Ass3_main {
     public static void main(String[] args) {
         BasicConfigurator.configure();
+        // Get AWS Client
         BasicAWSCredentials awsCredentials = GeneralUtils.loadCredentialsFromConfig();
         AWSLambda awsLambda = AWSLambdaClientBuilder
                 .standard()
@@ -44,12 +20,37 @@ public class Ass3_main {
                 .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
                 .build();
 
-        final Ass3_lambdaSingleService lambdaService = LambdaInvokerFactory.builder()
+        // Get Lambda Function SingleFibonacci
+        final Ass3_lambdaSingleService singleFibService = LambdaInvokerFactory.builder()
                 .lambdaClient(awsLambda)
                 .build(Ass3_lambdaSingleService.class);
+        // Get Lambda Function DistributeFibonacci
+        final Ass3_lambdaDistributedService distributeFibService = LambdaInvokerFactory.builder()
+                .lambdaClient(awsLambda)
+                .build(Ass3_lambdaDistributedService.class);
 
-        int[] input = {0,1,2,3,4,5,6,7,8,9};
-        BigInteger[] result = lambdaService.calc_fib(input);
+        // Fill input Array
+        int[] input = new int[36];
+        for (int i = 0; i < 36; i++) {
+            input[i] = i;
+        }
+
+        // Invoke SingleFibonacci
+        long runtimeSingle = System.currentTimeMillis();
+        BigInteger[] result_single = singleFibService.calc_fib(input);
+        runtimeSingle = System.currentTimeMillis() - runtimeSingle;
+        // Invoke DistributeFibonacci
+        long runtimeDistribute = System.currentTimeMillis();
+        BigInteger[] result_distributed = distributeFibService.calc_fib(input);
+        runtimeDistribute = System.currentTimeMillis() - runtimeDistribute;
+
+
+        System.out.println("Single Fibonacci Calculation took " + runtimeSingle/ ((float) 1000) + " sec");
+        System.out.println("Result = " + GeneralUtils.ArrayToString(result_single));
+        System.out.println("Distribute Fibonacci Calculation took " + runtimeDistribute/ ((float) 1000) + " sec");
+        System.out.println("Result = " + GeneralUtils.ArrayToString(result_distributed));
+
+
     }
 }
 

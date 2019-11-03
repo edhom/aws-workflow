@@ -35,20 +35,35 @@ public class Ass3_main {
             input[i] = i;
         }
 
-        // Invoke SingleFibonacci
-        long runtimeSingle = System.currentTimeMillis();
-        BigInteger[] result_single = singleFibService.calc_fib(input);
-        runtimeSingle = System.currentTimeMillis() - runtimeSingle;
-        // Invoke DistributeFibonacci
-        long runtimeDistribute = System.currentTimeMillis();
-        BigInteger[] result_distributed = distributeFibService.calc_fib(input);
-        runtimeDistribute = System.currentTimeMillis() - runtimeDistribute;
 
+        // Invoke SingleFibonacci and DistributeFibonacci
+        long[] singleFibonacci = new long[5];
+        BigInteger[] result_single = new BigInteger[35];
+        BigInteger[] result_distributed = new BigInteger[35];
+        long[] distributeFibonacci = new long[5];
+        for(int i = 0; i < 5; i++){
+            long runtimeSingle = System.currentTimeMillis();
+            result_single = singleFibService.calc_fib(input);
+            runtimeSingle = System.currentTimeMillis() - runtimeSingle;
+            singleFibonacci[0] = runtimeSingle;
 
-        System.out.println("Single Fibonacci Calculation took " + runtimeSingle/ ((float) 1000) + " sec");
-        System.out.println("Result = " + GeneralUtils.ArrayToString(result_single));
-        System.out.println("Distribute Fibonacci Calculation took " + runtimeDistribute/ ((float) 1000) + " sec");
-        System.out.println("Result = " + GeneralUtils.ArrayToString(result_distributed));
+            long runtimeDistribute = System.currentTimeMillis();
+            result_distributed = distributeFibService.calc_fib(input);
+            runtimeDistribute = System.currentTimeMillis() - runtimeDistribute;
+            distributeFibonacci[0] = runtimeDistribute;
+        }
+
+        System.out.println("\nSingle Fibonacci calculation took ");
+        System.out.println(GeneralUtils.ArrayToString(result_single));
+        for(Long single : singleFibonacci){
+            System.out.println("1. Execution: "  + single/ ((double) 1000) + " sec");
+        }
+
+        System.out.println("\nDistributed Fibonacci calculation took ");
+        System.out.println(GeneralUtils.ArrayToString(result_distributed));
+        for(Long distributed : distributeFibonacci){
+            System.out.println("1. Execution: "  + distributed/ ((double) 1000) + " sec");
+        }
 
 
     }

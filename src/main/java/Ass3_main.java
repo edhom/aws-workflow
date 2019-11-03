@@ -57,14 +57,14 @@ public class Ass3_main {
 
         System.out.println("\nSingle Fibonacci calculation took ");
         System.out.println(GeneralUtils.ArrayToString(result_single));
-        for(Double single : singleFibonacci){
-            System.out.println("1. Execution: "  + f.format(single/ ((double) 1000)) + " sec");
+        for(int i = 0; i < 5; i++){
+            System.out.println(i+1 + ". Execution: "  + f.format(singleFibonacci[i]/ ((double) 1000)) + " sec");
         }
 
         System.out.println("\nDistributed Fibonacci calculation took ");
         System.out.println(GeneralUtils.ArrayToString(result_distributed));
-        for(Double distributed : distributeFibonacci){
-            System.out.println("1. Execution: "  + f.format(distributed/ ((double) 1000)) + " sec");
+        for(int i = 0; i < 5; i++){
+            System.out.println(i+1 + ".Execution: "  + f.format(distributeFibonacci[i]/ ((double) 1000)) + " sec");
         }
 
 

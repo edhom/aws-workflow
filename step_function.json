@@ -1,0 +1,19 @@
+{
+  "StartAt": "Validate-All",
+  "States": {
+    "Validate-All": {
+    "Type": "Map",
+    "Iterator": {
+      "StartAt": "Fibonacci",
+      "States": {
+         "Fibonacci": {
+         "Type": "Task",
+	     "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:Fibonacci",
+         "End": true
+          }
+      }
+   },
+   "End": true
+   }
+  }
+}

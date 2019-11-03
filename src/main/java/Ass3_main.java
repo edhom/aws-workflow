@@ -31,7 +31,7 @@ public class Ass3_main {
 
         // Fill input Array
         int[] input = new int[36];
-        for (int i = 0; i < 36; i++) {
+        for (int i = 0; i < input.length; i++) {
             input[i] = i;
         }
 

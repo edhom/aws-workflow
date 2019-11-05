@@ -8,7 +8,7 @@ import java.util.*;
  * args[0]... InstanceType (String) i.e. "t2.large"
  * args[1]... Child ID i.e. "1"
  */
-public class Assignment1_Task_2_Child {
+public class Ass1_Task_2_Child {
 
     public static void main(String[] args) throws Exception {
 

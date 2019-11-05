@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class Assignment2_Task1 {
+public class Ass2_Task1 {
     @SuppressWarnings("Duplicates")
     public static void main(String[] args) throws InterruptedException, IOException {
         long startTime = System.currentTimeMillis();

@@ -36,7 +36,6 @@ public class Ass3_main {
             input[i] = i;
         }
 
-
         // Invoke SingleFibonacci and DistributeFibonacci
         double[] singleFibonacci = new double[5];
         BigInteger[] result_single = new BigInteger[35];

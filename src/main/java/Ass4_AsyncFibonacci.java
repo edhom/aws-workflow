@@ -1,34 +1,40 @@
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
-import com.amazonaws.services.lambda.AWSLambda;
+import com.amazonaws.services.lambda.AWSLambdaAsync;
 import com.amazonaws.services.lambda.AWSLambdaAsyncClientBuilder;
-import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
-import com.amazonaws.services.lambda.invoke.LambdaInvokerFactory;
+import com.amazonaws.services.lambda.model.InvokeRequest;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import java.util.concurrent.Future;
 
-import java.math.BigInteger;
+public class Ass4_AsyncFibonacci implements RequestHandler<Integer[], Void> {
+    public Void handleRequest(Integer[] input, Context context) {
 
-public class Ass4_AsyncFibonacci implements RequestHandler<int[], BigInteger[]> {
-    public BigInteger[] handleRequest(int[] input, Context context) {
-
-        AWSLambda awsLambda = AWSLambdaAsyncClientBuilder
+        AWSLambdaAsync awsLambda = AWSLambdaAsyncClientBuilder
                 .standard()
                 .withRegion(Regions.EU_CENTRAL_1)
                 .build();
 
-        final Ass3_lambdaSingleService lambdaService = LambdaInvokerFactory.builder()
-                .lambdaClient(awsLambda)
-                .build(Ass3_lambdaSingleService.class);
+        Future[] arr = new Future[input.length];
 
-        BigInteger[] result = new BigInteger[input.length];
-        int[] inputDivided = new int[1];
         for (int i = 0; i < input.length; i++) {
-            inputDivided[0] = input[i];
-            result[i] = lambdaService.calc_fib(inputDivided)[0];
+            InvokeRequest req = new InvokeRequest()
+                    .withFunctionName("FibonacciS3")
+                    .withPayload(input[i].toString());
+
+            arr[i] = awsLambda.invokeAsync(req);
         }
-        return result;
+        for (int i = 0; i < input.length; i++) {
+            while (!arr[i].isDone()) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    System.err.println("\nThread.sleep() was interrupted!");
+                    System.exit(1);
+                }
+            }
+        }
+        return null;
     }
 }
+
 

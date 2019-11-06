@@ -4,7 +4,6 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.lambda.AWSLambda;
 import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
 import com.amazonaws.services.lambda.invoke.LambdaInvokerFactory;
-import org.apache.log4j.BasicConfigurator;
 
 import java.math.BigInteger;
 import java.text.DecimalFormat;
@@ -12,7 +11,7 @@ import java.text.DecimalFormat;
 
 public class Ass3_main {
     public static void main(String[] args) {
-        BasicConfigurator.configure();
+
         // Get AWS Client
         BasicAWSCredentials awsCredentials = GeneralUtils.loadCredentialsFromConfig();
         AWSLambda awsLambda = AWSLambdaClientBuilder

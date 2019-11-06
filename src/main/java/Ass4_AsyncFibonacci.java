@@ -10,7 +10,7 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 
 import java.math.BigInteger;
 
-public class Ass3_DistributeFibonacci implements RequestHandler<int[], BigInteger[]> {
+public class Ass4_AsyncFibonacci implements RequestHandler<int[], BigInteger[]> {
     public BigInteger[] handleRequest(int[] input, Context context) {
 
         AWSLambda awsLambda = AWSLambdaAsyncClientBuilder
@@ -31,3 +31,4 @@ public class Ass3_DistributeFibonacci implements RequestHandler<int[], BigIntege
         return result;
     }
 }
+

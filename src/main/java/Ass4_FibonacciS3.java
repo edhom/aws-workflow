@@ -19,7 +19,7 @@ public class Ass4_FibonacciS3 implements RequestHandler<int[], BigInteger[]> {
         for (int i = 0; i < input.length; i++) {
             result[i] = fib(input[i]);
         }
-        storeInS3(result);
+        storeInS3(result, input[0]);
         return result;
     }
 
@@ -32,8 +32,8 @@ public class Ass4_FibonacciS3 implements RequestHandler<int[], BigInteger[]> {
         return fib(n - 2).add(fib(n - 1));
     }
 
-    public void storeInS3(BigInteger[] result) {
-        s3client.putObject(bucketName, "result" + result[0].toString(), GeneralUtils.ArrayToString(result));
+    public void storeInS3(BigInteger[] result, Integer func_num) {
+        s3client.putObject(bucketName, "result" + func_num.toString(), GeneralUtils.ArrayToString(result));
     }
 
 

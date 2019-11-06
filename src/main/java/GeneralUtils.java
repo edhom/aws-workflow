@@ -148,11 +148,11 @@ public class GeneralUtils {
     }
 
     public static String ArrayToString(BigInteger[] arr) {
-        StringJoiner join = new StringJoiner(", ");
+        StringJoiner join = new StringJoiner(" ");
         for (BigInteger x : arr) {
             join.add(x.toString());
         }
-        return "[" + join.toString() + "]";
+        return join.toString();
     }
 
 }

@@ -2,12 +2,13 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.lambda.AWSLambdaAsync;
 import com.amazonaws.services.lambda.AWSLambdaAsyncClientBuilder;
 import com.amazonaws.services.lambda.model.InvokeRequest;
+import com.amazonaws.services.lambda.model.InvokeResult;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import java.util.concurrent.Future;
 
-public class Ass4_AsyncFibonacci implements RequestHandler<Integer[], Void> {
-    public Void handleRequest(Integer[] input, Context context) {
+public class Ass4_AsyncFibonacci implements RequestHandler<Integer[], Boolean> {
+    public Boolean handleRequest(Integer[] input, Context context) {
 
         AWSLambdaAsync awsLambda = AWSLambdaAsyncClientBuilder
                 .standard()
@@ -37,9 +38,12 @@ public class Ass4_AsyncFibonacci implements RequestHandler<Integer[], Void> {
         InvokeRequest collectRequest = new InvokeRequest()
                 .withFunctionName("CheckResult")
                 .withPayload(String.valueOf(input.length));
-        awsLambda.invoke(collectRequest);
+        InvokeResult result = awsLambda.invoke(collectRequest);
 
-        return null;
+        if(result.getStatusCode() > 0){
+            return true;
+        }
+        return false;
     }
 }
 

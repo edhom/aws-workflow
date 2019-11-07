@@ -33,6 +33,12 @@ public class Ass4_AsyncFibonacci implements RequestHandler<Integer[], Void> {
                 }
             }
         }
+
+        InvokeRequest collectRequest = new InvokeRequest()
+                .withFunctionName("CheckResult")
+                .withPayload(String.valueOf(input.length));
+        awsLambda.invoke(collectRequest);
+
         return null;
     }
 }

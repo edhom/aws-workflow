@@ -7,7 +7,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import java.math.BigInteger;
 
 public class Ass4_FibonacciS3 implements RequestHandler<int[], BigInteger[]> {
-    private String bucketName = "dhom.distributedsystems.fib";
+    private String bucketName = "fibonacci.distributed.systems.geiger";
 
     AmazonS3 s3client = AmazonS3ClientBuilder
             .standard()

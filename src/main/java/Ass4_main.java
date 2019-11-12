@@ -29,10 +29,8 @@ public class Ass4_main {
         for (int i = 0; i < input.length; i++) {
             input[i] = i;
         }
-        //periodic(awsLambda, asyncFibService, input);
-        eventDriven(awsLambda, asyncFibService, input);
-
-
+        periodic(awsLambda, asyncFibService, input);
+        //eventDriven(awsLambda, asyncFibService, input);
 
     }
 
@@ -78,7 +76,8 @@ public class Ass4_main {
 
         long runtimeAsync = System.currentTimeMillis();
         try {
-            thread1.start();thread2.start();
+            thread1.start();
+            thread2.start();
             thread1.join();
             thread2.join();
         } catch (InterruptedException e) {

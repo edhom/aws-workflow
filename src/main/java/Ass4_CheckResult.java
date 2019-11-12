@@ -8,7 +8,7 @@ import com.amazonaws.services.s3.model.S3Object;
 import java.util.StringJoiner;
 
 public class Ass4_CheckResult implements RequestHandler<Integer, Boolean> {
-    private String bucketName = "fibonacci.distributed.systems.geiger";
+    private String bucketName = "dhom.distributedsystems.fib";
 
     AmazonS3 s3client = AmazonS3ClientBuilder
             .standard()

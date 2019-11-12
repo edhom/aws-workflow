@@ -1,3 +1,5 @@
+package Homework;
+
 import com.amazonaws.services.lambda.invoke.LambdaFunction;
 
 public interface Ass4_lambdaCheckResultService {

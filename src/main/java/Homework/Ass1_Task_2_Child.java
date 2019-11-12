@@ -1,3 +1,5 @@
+package Homework;
+
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.*;
 import net.schmizz.sshj.SSHClient;

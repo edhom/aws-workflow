@@ -1,3 +1,5 @@
+package Homework;
+
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import net.schmizz.sshj.SSHClient;
@@ -56,7 +58,7 @@ public class Ass2_Task1 {
         long dockerStartTime = System.currentTimeMillis();
         SSHUtils.executeCMD(sshClient, "sudo yum update -y", 600);
         SSHUtils.executeCMD(sshClient, "sudo amazon-linux-extras install docker", 600);
-        //SSHUtils.executeCMD(sshClient, "y", 600);
+        //Homework.SSHUtils.executeCMD(sshClient, "y", 600);
         long dockerTime = System.currentTimeMillis() - dockerStartTime;
 
         //Docker start and login

@@ -1,3 +1,5 @@
+package Homework;
+
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
@@ -29,10 +31,8 @@ public class Ass4_main {
         for (int i = 0; i < input.length; i++) {
             input[i] = i;
         }
-        //periodic(awsLambda, asyncFibService, input);
-        eventDriven(awsLambda, asyncFibService, input);
-
-
+        periodic(awsLambda, asyncFibService, input);
+        //eventDriven(awsLambda, asyncFibService, input);
 
     }
 
@@ -75,7 +75,6 @@ public class Ass4_main {
             }
         });
 
-
         long runtimeAsync = System.currentTimeMillis();
         try {
             thread1.start();thread2.start();
@@ -87,7 +86,6 @@ public class Ass4_main {
         double asyncFibonacci = System.currentTimeMillis() - runtimeAsync;
 
         System.out.println("\n\nInvoked CheckResult " + loop[0] + " times");
-
 
         DecimalFormat f = new DecimalFormat("#0.00000");
         System.out.println("\nAsynchronous Fibonacci calculation took ");

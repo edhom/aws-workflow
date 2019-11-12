@@ -1,3 +1,5 @@
+package Homework;
+
 import com.amazonaws.services.ec2.*;
 import com.amazonaws.services.ec2.model.*;
 import com.amazonaws.services.rds.model.IPRange;

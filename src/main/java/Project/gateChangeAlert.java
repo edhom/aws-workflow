@@ -1,4 +1,4 @@
-package Homework05;
+package Project;
 
 import com.dps.afcl.Function;
 import com.dps.afcl.Workflow;
@@ -11,62 +11,118 @@ import com.dps.afcl.utils.Utils;
 import java.util.Arrays;
 
 public class gateChangeAlert {
-
+    @SuppressWarnings("Duplicates")
     public static void main(String[] args) {
+
+        // TODO: Pfad setzen
+        String path = "";
 
         // Create a new workflow
         Workflow workflow = new Workflow();
-        workflow.setName("gateChangeAlert");
+        workflow.setName("RideOffer");
 
-        // Set example workflow input
-        workflow.setDataIns(Arrays.asList(new DataIns("InVal", "number", "some source")));
+        // TODO: Brauchen wir einen Input? rideRequest holt sich Input?
+        //workflow.setDataIns(Arrays.asList(new DataIns("InVal", "number", "some source")));
 
-        // getFlight
-        AtomicFunction getFlight = new AtomicFunction("getFlight", "getFlightType", Arrays.asList(new DataIns("InVal", "number", workflow.getName() + "/" + workflow.getDataIns().get(0).getName())), Arrays.asList(new DataOutsAtomic("OutVal", "string")));
+        // f1_rideRequest
+        AtomicFunction f1_rideRequest = new AtomicFunction("f1_rideRequest", "f1_rideRequestType", null, Arrays.asList(new DataOutsAtomic("OutVal1", "collection")));
 
-        // selectPassenger
-        AtomicFunction selectPassenger = new AtomicFunction("selectPassenger", "selectPassengerType", Arrays.asList(getDataOuts("InVal", "string", getFlight, 0)), Arrays.asList(new DataOutsAtomic("OutVal", "collection"), new DataOutsAtomic("OutVal2", "number")));
+        // ifThenElse for ride request list
+        IfThenElse ifThenElse1 = new IfThenElse();
+        ifThenElse1.setName("ifThenElse1");
+        ifThenElse1.setDataIns(Arrays.asList(getDataIns("InVal1", "collection", f1_rideRequest, 0)));
+        ifThenElse1.setCondition(new Condition("and", Arrays.asList(new ACondition(getDataInsByIndex(ifThenElse1,0),"isEmpty()","."))));
 
-        // parallelFor
+
+        // parallelFor RideRequest
         ParallelFor parallelFor = new ParallelFor();
-        parallelFor.setName("parallelFor");
-        DataInsDataFlow dataIns = new DataInsDataFlow("InVal","collection", selectPassenger.getName() + "/" + selectPassenger.getDataOuts().get(0).getName());
+        parallelFor.setName("parallelForRideRequest");
+        DataInsDataFlow dataIns = new DataInsDataFlow("InVal2","collection", f1_rideRequest.getName() + "/" + f1_rideRequest.getDataOuts().get(0).getName());
+
+        // TODO: Für was DataFlowBlock? Passt der Pfad für dataIns?
         dataIns.setDataFlow(new DataFlowBlock("5"));
         parallelFor.setDataIns(Arrays.asList(dataIns));
-        parallelFor.setLoopCounter(new LoopCounter("counter", "number", "0", getDataOutsByIndex(selectPassenger,1)));
 
-        // parallel (informPassenger and calculateTimeToGate)
+        // TODO: Bedingung angeben, also dass aus rideRequest Liste jeweils ein request bearbeitet wird
+        parallelFor.setLoopCounter(new LoopCounter("counter", "request", "0", getDataOutsByIndex(f1_rideRequest, 0)));
+
+        // checkMatch
+        AtomicFunction f2_checkMatch = new AtomicFunction("f2_checkMatch", "f2_checkMatchType", Arrays.asList(new DataIns("InVal3", "request", parallelFor.getName() +  "/" + parallelFor.getDataIns().get(0).getName())), Arrays.asList(new DataOutsAtomic("OutVal3", "number")));
+
+        // ifThenElse for checking match
+        IfThenElse ifThenElse2 = new IfThenElse();
+        ifThenElse2.setName("ifThenElse");
+        ifThenElse2.setDataIns(Arrays.asList(getDataOuts("InVal4", "collection", f2_checkMatch, 0)));
+        ifThenElse2.setCondition(new Condition("and", Arrays.asList(new ACondition(getDataInsByIndex(ifThenElse2,0),"true",".equals"))));
+
+        // parallel for calcProfit and calcOverhead
         Parallel parallelF3F4 = new Parallel();
         parallelF3F4.setName("parallelF3F4");
-        DataInsDataFlow dataInsParallel = new DataInsDataFlow("InVal", "collection", parallelFor.getName() + "/" + parallelFor.getDataIns().get(0).getName());
+        DataInsDataFlow dataInsParallel = new DataInsDataFlow("InVal5", "collection", parallelFor.getName() + "/" + parallelFor.getDataIns().get(0).getName());
         parallelF3F4.setDataIns(Arrays.asList(dataInsParallel));
-        AtomicFunction informPassenger = new AtomicFunction("informPassenger", "informPassengerType", Arrays.asList(getDataIns("InVal", "string", parallelF3F4, 0)), null);
-        AtomicFunction calculateTimeToGate = new AtomicFunction("calculateTimeToGate", "calculateTimeToGateType", Arrays.asList(getDataIns("InVal", "string", parallelF3F4, 0)), Arrays.asList(new DataOutsAtomic("OutVal", "number")));
 
-        // ifThenElse (recommendShop and informTimeCritical)
-        IfThenElse ifThenElse = new IfThenElse();
-        ifThenElse.setName("ifThenElse");
-        ifThenElse.setDataIns(Arrays.asList(getDataOuts("InVal", "number", calculateTimeToGate, 0)));
-        ifThenElse.setCondition(new Condition("and", Arrays.asList(new ACondition(getDataInsByIndex(ifThenElse,0),"20",">"))));
-        AtomicFunction recommendShop = new AtomicFunction("recommendShop", "recommendShopType", Arrays.asList(getDataIns("InVal", "number", ifThenElse, 0)), Arrays.asList(new DataOutsAtomic("OutVal", "string")));
-        AtomicFunction informTimeCritical = new AtomicFunction("informTimeCritical", "informTimeCriticalType", Arrays.asList(getDataIns("InVal", "number", ifThenElse, 0)), Arrays.asList(new DataOutsAtomic("OutVal", "string")));
-        ifThenElse.setThen(Arrays.asList(recommendShop));
-        ifThenElse.setElse(Arrays.asList(informTimeCritical));
-        ifThenElse.setDataOuts(Arrays.asList(new DataOuts("OutVal", "string", getDataOutsByIndex(recommendShop,0)+","+getDataOutsByIndex(informTimeCritical,0))));
+        //informPassenger
+        AtomicFunction f3_calcProfit = new AtomicFunction("f3_calcProfit", "f3_calcProfitType", Arrays.asList(getDataIns("InVal6", "request", parallelF3F4, 0)), Arrays.asList(new DataOutsAtomic("OutVal4", "number")));
 
-        parallelF3F4.setParallelBody(Arrays.asList(new Section(Arrays.asList(informPassenger)), new Section(Arrays.asList(calculateTimeToGate, ifThenElse))));
-        parallelF3F4.setDataOuts(Arrays.asList(new DataOuts("OutVal", "string", getDataOutsByIndex(ifThenElse,0))));
-        parallelFor.setLoopBody(Arrays.asList(parallelF3F4));
-        parallelFor.setDataOuts(Arrays.asList(new DataOuts("OutVal", "collection", getDataOutsByIndex(parallelF3F4,0))));
+        //calcTimeToGate
+        AtomicFunction f4_calcOverhead = new AtomicFunction("f4_calcOverhead", "f4_calcOverheadType", Arrays.asList(getDataIns("InVal7", "request", parallelF3F4, 0)), Arrays.asList(new DataOutsAtomic("OutVal5", "request")));
+        AtomicFunction f5_calcOverheadInTime = new AtomicFunction("f5_calcOverheadInTime", "f5_calcOverheadInTimeType", Arrays.asList(getDataIns("InVal8", "request", parallelF3F4, 0)), Arrays.asList(new DataOutsAtomic("OutVal6", "request")));
 
-        // log
-        AtomicFunction log = new AtomicFunction("log", "logType", Arrays.asList(getDataOuts("InVal", "collection", parallelFor, 0)), null);
+
+        parallelF3F4.setParallelBody(Arrays.asList(new Section(Arrays.asList(f3_calcProfit)), new Section(Arrays.asList(f4_calcOverhead, f5_calcOverheadInTime))));
+
+        // TODO: Nicht sicher ob output so passt
+        parallelF3F4.setDataOuts(Arrays.asList(new DataOuts("OutVal7", "request", getDataOutsByIndex(f3_calcProfit,0) + ", "+ getDataOutsByIndex(f5_calcOverheadInTime, 0))));
+
+        ifThenElse2.setThen(Arrays.asList(parallelF3F4));
+        ifThenElse2.setElse(Arrays.asList(null));
+        ifThenElse2.setDataOuts(Arrays.asList(new DataOuts("OutVal8", "request", getDataOutsByIndex(parallelF3F4,0))));
+
+
+        parallelFor.setLoopBody(Arrays.asList(f2_checkMatch, parallelF3F4));
+
+        // TODO: Output wieder Collection??
+        parallelFor.setDataOuts(Arrays.asList(new DataOuts("OutVal9", "collection", getDataOutsByIndex(parallelF3F4,0))));
+
+
+        // f6_optimalRideRequest just one request as output, not collection
+        AtomicFunction f6_optimalRideRequest = new AtomicFunction("f6_optimalRideRequest", "f6_optimalRideRequestType", Arrays.asList(new DataIns("InVal9", "collection", parallelFor.getName() + "/" + parallelFor.getDataIns().get(0).getName())), Arrays.asList(new DataOutsAtomic("OutVal10", "request")));
+
+        // f7_optimalPickUp
+        AtomicFunction f7_optimalPickUp = new AtomicFunction("f7_optimalPickUp", "f7_optimalPickUpType", Arrays.asList(new DataIns("InVal10", "request", f6_optimalRideRequest.getName() + "/" + f6_optimalRideRequest.getDataIns().get(0).getName())), Arrays.asList(new DataOutsAtomic("OutVal11", "request")));
+
+
+        // parallel f8 and f9
+        Parallel parallelF8F9 = new Parallel();
+        parallelF8F9.setName("parallelF3F4");
+        DataInsDataFlow dataInsParallel2 = new DataInsDataFlow("InVal", "collection", parallelFor.getName() + "/" + parallelFor.getDataIns().get(0).getName());
+        parallelF8F9.setDataIns(Arrays.asList(dataInsParallel2));
+
+        // f8_informPassenger
+        AtomicFunction f8_informPassanger = new AtomicFunction("f8_informPassenger", "f8_informPassengerType", Arrays.asList(getDataIns("InVal11", "request", parallelF3F4, 0)), Arrays.asList(new DataOutsAtomic("OutVal12", "boolean")));
+
+        // f9_informDriver
+        AtomicFunction f9_informDriver = new AtomicFunction("f9_informDriver", "f9_informDriverType", Arrays.asList(getDataIns("InVal12", "request", parallelF3F4, 0)), Arrays.asList(new DataOutsAtomic("OutVal13", "boolean")));
+
+
+        parallelF8F9.setParallelBody(Arrays.asList(new Section(Arrays.asList(f8_informPassanger)), new Section(Arrays.asList(f9_informDriver))));
+        // TODO: Nicht sicher ob output so passt
+        parallelF8F9.setDataOuts(Arrays.asList(new DataOuts("OutVal14", "request", getDataOutsByIndex(f8_informPassanger,0) + ", "+ getDataOutsByIndex(f9_informDriver, 0))));
+
+        // TODO: f10_logDatabase Output??
+        AtomicFunction f10_logDatabase = new AtomicFunction("f10_logDatabase", "f10_logDatabaseType", Arrays.asList(getDataOuts("InVal13", "collection", f1_rideRequest, 0)), null);
+
+
+        ifThenElse1.setThen(Arrays.asList(parallelFor));
+        ifThenElse1.setElse(Arrays.asList(f10_logDatabase));
+        ifThenElse1.setDataOuts(Arrays.asList(new DataOuts("OutVal15", "string", getDataOutsByIndex(parallelFor,0)+","+getDataOutsByIndex(f10_logDatabase,0))));
+
 
         // Set all compounds as a sequence
-        workflow.setWorkflowBody(Arrays.asList(getFlight, selectPassenger, parallelFor, log));
+        workflow.setWorkflowBody(Arrays.asList(f1_rideRequest, parallelFor, f6_optimalRideRequest, f7_optimalPickUp, f10_logDatabase));
 
         // Validate workflow and write as YAML
-        Utils.writeYaml(workflow, "gateChangeAlert.yaml", "schema.json");
+        Utils.writeYaml(workflow, "gateChangeAlert.yaml", path);
     }
 
 

@@ -15,7 +15,7 @@ public class gateChangeAlert {
     public static void main(String[] args) {
 
         // TODO: Pfad setzen
-        String path = "";
+        String path = "/Users/ericdhom/Desktop/Uni/Semester3/VerteilteSysteme/Repo/src/main/resources/schema.json";
 
         // Create a new workflow
         Workflow workflow = new Workflow();
@@ -30,7 +30,7 @@ public class gateChangeAlert {
         // ifThenElse for ride request list
         IfThenElse ifThenElse1 = new IfThenElse();
         ifThenElse1.setName("ifThenElse1");
-        ifThenElse1.setDataIns(Arrays.asList(getDataIns("InVal1", "collection", f1_rideRequest, 0)));
+        ifThenElse1.setDataIns(Arrays.asList(getDataOuts("InVal1", "collection", f1_rideRequest, 0)));
         ifThenElse1.setCondition(new Condition("and", Arrays.asList(new ACondition(getDataInsByIndex(ifThenElse1,0),"isEmpty()","."))));
 
 
@@ -44,21 +44,22 @@ public class gateChangeAlert {
         parallelFor.setDataIns(Arrays.asList(dataIns));
 
         // TODO: Bedingung angeben, also dass aus rideRequest Liste jeweils ein request bearbeitet wird
-        parallelFor.setLoopCounter(new LoopCounter("counter", "request", "0", getDataOutsByIndex(f1_rideRequest, 0)));
+        // question: Warum 22 als Länge des Arrays?
+        parallelFor.setLoopCounter(new LoopCounter("counter", "number", "0", ((Integer)getDataOutsByIndex(f1_rideRequest, 0).length()).toString()));
 
         // checkMatch
-        AtomicFunction f2_checkMatch = new AtomicFunction("f2_checkMatch", "f2_checkMatchType", Arrays.asList(new DataIns("InVal3", "request", parallelFor.getName() +  "/" + parallelFor.getDataIns().get(0).getName())), Arrays.asList(new DataOutsAtomic("OutVal3", "number")));
+        AtomicFunction f2_checkMatch = new AtomicFunction("f2_checkMatch", "f2_checkMatchType", Arrays.asList(new DataIns("InVal3", "request", parallelFor.getName() +  "/" + parallelFor.getDataIns().get(0).getName())), Arrays.asList(new DataOutsAtomic("OutVal3", "boolean")));
 
         // ifThenElse for checking match
         IfThenElse ifThenElse2 = new IfThenElse();
         ifThenElse2.setName("ifThenElse");
-        ifThenElse2.setDataIns(Arrays.asList(getDataOuts("InVal4", "collection", f2_checkMatch, 0)));
-        ifThenElse2.setCondition(new Condition("and", Arrays.asList(new ACondition(getDataInsByIndex(ifThenElse2,0),"true",".equals"))));
+        ifThenElse2.setDataIns(Arrays.asList(getDataOuts("InVal4", "request", f2_checkMatch, 0)));
+        ifThenElse2.setCondition(new Condition("and", Arrays.asList(new ACondition(getDataInsByIndex(ifThenElse2,0),"true","=="))));
 
         // parallel for calcProfit and calcOverhead
         Parallel parallelF3F4 = new Parallel();
         parallelF3F4.setName("parallelF3F4");
-        DataInsDataFlow dataInsParallel = new DataInsDataFlow("InVal5", "collection", parallelFor.getName() + "/" + parallelFor.getDataIns().get(0).getName());
+        DataInsDataFlow dataInsParallel = new DataInsDataFlow("InVal5", "request", parallelFor.getName() + "/" + parallelFor.getDataIns().get(0).getName());
         parallelF3F4.setDataIns(Arrays.asList(dataInsParallel));
 
         //informPassenger
@@ -71,11 +72,10 @@ public class gateChangeAlert {
 
         parallelF3F4.setParallelBody(Arrays.asList(new Section(Arrays.asList(f3_calcProfit)), new Section(Arrays.asList(f4_calcOverhead, f5_calcOverheadInTime))));
 
-        // TODO: Nicht sicher ob output so passt
         parallelF3F4.setDataOuts(Arrays.asList(new DataOuts("OutVal7", "request", getDataOutsByIndex(f3_calcProfit,0) + ", "+ getDataOutsByIndex(f5_calcOverheadInTime, 0))));
 
         ifThenElse2.setThen(Arrays.asList(parallelF3F4));
-        ifThenElse2.setElse(Arrays.asList(null));
+        ifThenElse2.setElse(null);
         ifThenElse2.setDataOuts(Arrays.asList(new DataOuts("OutVal8", "request", getDataOutsByIndex(parallelF3F4,0))));
 
 
@@ -113,13 +113,13 @@ public class gateChangeAlert {
         AtomicFunction f10_logDatabase = new AtomicFunction("f10_logDatabase", "f10_logDatabaseType", Arrays.asList(getDataOuts("InVal13", "collection", f1_rideRequest, 0)), null);
 
 
-        ifThenElse1.setThen(Arrays.asList(parallelFor));
+        ifThenElse1.setThen(Arrays.asList(parallelFor, f6_optimalRideRequest, f7_optimalPickUp, parallelF8F9));
         ifThenElse1.setElse(Arrays.asList(f10_logDatabase));
-        ifThenElse1.setDataOuts(Arrays.asList(new DataOuts("OutVal15", "string", getDataOutsByIndex(parallelFor,0)+","+getDataOutsByIndex(f10_logDatabase,0))));
+        ifThenElse1.setDataOuts(Arrays.asList(new DataOuts("OutVal15", "string", getDataOutsByIndex(parallelFor,0) ))); //+ ","+/getDataOutsByIndex(f10_logDatabase,0)
 
 
         // Set all compounds as a sequence
-        workflow.setWorkflowBody(Arrays.asList(f1_rideRequest, parallelFor, f6_optimalRideRequest, f7_optimalPickUp, f10_logDatabase));
+        workflow.setWorkflowBody(Arrays.asList(f1_rideRequest, parallelFor, f6_optimalRideRequest, f7_optimalPickUp, parallelF8F9, f10_logDatabase));
 
         // Validate workflow and write as YAML
         Utils.writeYaml(workflow, "gateChangeAlert.yaml", path);

@@ -1,4 +1,5 @@
-{  "A": {
+{
+   "A": {
       "x": null,
       "y": null
    },
@@ -9,5 +10,6 @@
    "Profit": null,
    "Overhead": null,
    "OverheadinTime": null,
-   "OptimalPickUp": null
+   "OptimalPickUp": null,
+   "EstimatedTime": null
 }

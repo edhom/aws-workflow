@@ -7,7 +7,6 @@ import com.dps.afcl.functions.objects.*;
 import com.dps.afcl.functions.objects.dataflow.DataFlowBlock;
 import com.dps.afcl.functions.objects.dataflow.DataInsDataFlow;
 import com.dps.afcl.utils.Utils;
-
 import java.util.Arrays;
 
 public class gateChangeAlert {
@@ -21,17 +20,16 @@ public class gateChangeAlert {
         Workflow workflow = new Workflow();
         workflow.setName("RideOffer");
 
-        // TODO: Brauchen wir einen Input? rideRequest holt sich Input?
-        //workflow.setDataIns(Arrays.asList(new DataIns("InVal", "number", "some source")));
-
         // f1_rideRequest
-        AtomicFunction f1_rideRequest = new AtomicFunction("f1_rideRequest", "f1_rideRequestType", null, Arrays.asList(new DataOutsAtomic("OutVal1", "collection")));
+        AtomicFunction f1_rideRequest = new AtomicFunction("f1_rideRequest", "f1_rideRequestType", null, Arrays.asList(new DataOutsAtomic("OutVal1", "collection"), new DataOutsAtomic("numRequests", "number")));
 
         // ifThenElse for ride request list
         IfThenElse ifThenElse1 = new IfThenElse();
         ifThenElse1.setName("ifThenElse1");
+
+        // TODO: Contition richtig?
         ifThenElse1.setDataIns(Arrays.asList(getDataOuts("InVal1", "collection", f1_rideRequest, 0)));
-        ifThenElse1.setCondition(new Condition("and", Arrays.asList(new ACondition(getDataInsByIndex(ifThenElse1,0),"isEmpty()","."))));
+        ifThenElse1.setCondition(new Condition("and", Arrays.asList(new ACondition(getDataInsByIndex(ifThenElse1,0),null,"notEmpty"))));
 
 
         // parallelFor RideRequest
@@ -40,12 +38,10 @@ public class gateChangeAlert {
         DataInsDataFlow dataIns = new DataInsDataFlow("InVal2","collection", f1_rideRequest.getName() + "/" + f1_rideRequest.getDataOuts().get(0).getName());
 
         // TODO: Für was DataFlowBlock? Passt der Pfad für dataIns?
-        dataIns.setDataFlow(new DataFlowBlock("5"));
+        dataIns.setDataFlow(new DataFlowBlock("1"));
         parallelFor.setDataIns(Arrays.asList(dataIns));
 
-        // TODO: Bedingung angeben, also dass aus rideRequest Liste jeweils ein request bearbeitet wird
-        // question: Warum 22 als Länge des Arrays?
-        parallelFor.setLoopCounter(new LoopCounter("counter", "number", "0", ((Integer)getDataOutsByIndex(f1_rideRequest, 0).length()).toString()));
+        parallelFor.setLoopCounter(new LoopCounter("counter", "number", "0", getDataOutsByIndex(f1_rideRequest, 1)));
 
         // checkMatch
         AtomicFunction f2_checkMatch = new AtomicFunction("f2_checkMatch", "f2_checkMatchType", Arrays.asList(new DataIns("InVal3", "request", parallelFor.getName() +  "/" + parallelFor.getDataIns().get(0).getName())), Arrays.asList(new DataOutsAtomic("OutVal3", "boolean")));
@@ -82,7 +78,7 @@ public class gateChangeAlert {
         parallelFor.setLoopBody(Arrays.asList(f2_checkMatch, parallelF3F4));
 
         // TODO: Output wieder Collection??
-        parallelFor.setDataOuts(Arrays.asList(new DataOuts("OutVal9", "collection", getDataOutsByIndex(parallelF3F4,0))));
+        parallelFor.setDataOuts(Arrays.asList(new DataOuts("OutVal9", "request", getDataOutsByIndex(parallelF3F4,0))));
 
 
         // f6_optimalRideRequest just one request as output, not collection
@@ -106,10 +102,8 @@ public class gateChangeAlert {
 
 
         parallelF8F9.setParallelBody(Arrays.asList(new Section(Arrays.asList(f8_informPassanger)), new Section(Arrays.asList(f9_informDriver))));
-        // TODO: Nicht sicher ob output so passt
         parallelF8F9.setDataOuts(Arrays.asList(new DataOuts("OutVal14", "request", getDataOutsByIndex(f8_informPassanger,0) + ", "+ getDataOutsByIndex(f9_informDriver, 0))));
 
-        // TODO: f10_logDatabase Output??
         AtomicFunction f10_logDatabase = new AtomicFunction("f10_logDatabase", "f10_logDatabaseType", Arrays.asList(getDataOuts("InVal13", "collection", f1_rideRequest, 0)), null);
 
 
@@ -123,6 +117,8 @@ public class gateChangeAlert {
 
         // Validate workflow and write as YAML
         Utils.writeYaml(workflow, "gateChangeAlert.yaml", path);
+
+        //Utils.readYAML("gateChangeAlert.yaml", )
     }
 
 

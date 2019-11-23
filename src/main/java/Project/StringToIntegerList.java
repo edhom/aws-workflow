@@ -19,7 +19,7 @@ public class StringToIntegerList {
         Pattern p = Pattern.compile("\\d+");
         Matcher m = p.matcher(string);
         while(m.find()) {
-            System.out.println(m.group());
+            //System.out.println(m.group());
             intArray.add(Integer.parseInt(m.group()));
         }
         return intArray;

@@ -1,33 +1,61 @@
 package Project;
 
+import Homework.GeneralUtils;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-import java.util.List;
+public class f7_OptimalPickUp implements RequestHandler<JSONObject, JSONObject> {
+    String bucketName = "ride.offer.geiger";
 
-import static java.lang.StrictMath.abs;
+    AmazonS3 s3client = AmazonS3ClientBuilder
+            .standard()
+            .withRegion(Regions.EU_CENTRAL_1)
+            .build();
 
-public class f7_OptimalPickUp implements RequestHandler<String, String> {
-
+    @SuppressWarnings("Duplicates")
     @Override
-    public String handleRequest(String input, Context context) {
-        List<Integer> coordinates = StringToIntegerList.buildIntegerArray(input);
+    public JSONObject handleRequest(JSONObject input, Context context) {
 
-        int x = abs(coordinates.get(0) - coordinates.get(2));
-        int y = abs(coordinates.get(1) - coordinates.get(3));
+        String a = input.toJSONString();
+        JSONParser parserRequest = new JSONParser();
 
-        StringBuilder sb = new StringBuilder(input);
-        sb.deleteCharAt(input.length()-1);
+        S3Object object = s3client.getObject(new GetObjectRequest(bucketName, "driver.txt"));
+        String content = GeneralUtils.getStringFromInputStream(object.getObjectContent());
+        JSONParser parserDriver = new JSONParser();
+        try {
+            JSONObject objRequest = (JSONObject) parserRequest.parse(a);
+            JSONObject coordinatesARequest = (JSONObject) objRequest.get("A");
+            Integer aXRequest = Integer.parseInt(coordinatesARequest.get("x").toString());
+            Integer aYRequest = Integer.parseInt(coordinatesARequest.get("y").toString());
 
-        /*if (x + y == 1){
-            sb.append(",(wait, 5 minutes))");
+            JSONObject objDriver = (JSONObject) parserDriver.parse(content);
+            JSONObject coordinatesADriver = (JSONObject) objDriver.get("A");
+            Integer aXDriver = Integer.parseInt(coordinatesADriver.get("x").toString());
+            Integer aYDriver = Integer.parseInt(coordinatesADriver.get("y").toString());
+
+            Integer x = Math.abs(aXRequest - aXDriver);
+            Integer y = Math.abs(aYRequest - aYDriver);
+
+            Integer minutes = (x + y);
+
+            JSONObject pickUp = (JSONObject) objRequest.get("OptimalPickUp");
+            pickUp.put("x", aXRequest);
+            pickUp.put("y", aYRequest);
+            pickUp.put("inMinutes", minutes);
+
+            return objRequest;
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        else{
-            sb.append(",(pickUp))");
-        }*/
-        Integer pickUpTime = (x + y);
-        sb.append(",(pickUp in " + pickUpTime + " minutes))");
 
-        return sb.toString();
+        return null;
     }
 }

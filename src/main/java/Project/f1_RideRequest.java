@@ -1,19 +1,22 @@
 package Project;
 
 import Homework.GeneralUtils;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.iterable.S3Objects;
-import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.amazonaws.services.s3.model.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-import java.util.StringJoiner;
+import java.util.List;
 
-public class f1_RideRequest implements RequestHandler<Void, String> {
+public class f1_RideRequest implements RequestHandler<Void, JSONArray> {
+    @SuppressWarnings("Duplicates")
     private String bucketName = "ride.offer.geiger";
 
     AmazonS3 s3client = AmazonS3ClientBuilder
@@ -22,15 +25,28 @@ public class f1_RideRequest implements RequestHandler<Void, String> {
             .build();
 
     @Override
-    public String handleRequest(Void input, Context context) {
-        StringJoiner res = new StringJoiner(", ");
+    public JSONArray handleRequest(Void input, Context context) {
+        JSONArray jsonArray = new JSONArray();
+        ObjectListing listing = s3client.listObjects(bucketName, "input");
+        List<S3ObjectSummary> summaries = listing.getObjectSummaries();
 
-        S3Objects.inBucket(s3client, bucketName).forEach((S3ObjectSummary objectSummary) -> {
-            S3Object object = s3client.getObject(new GetObjectRequest(bucketName, objectSummary.getKey()));
+        while (listing.isTruncated()) {
+            listing = s3client.listNextBatchOfObjects (listing);
+            summaries.addAll (listing.getObjectSummaries());
+        }
+
+        for(S3ObjectSummary file : summaries){
+            S3Object object = s3client.getObject(new GetObjectRequest(bucketName, file.getKey()));
             String content = GeneralUtils.getStringFromInputStream(object.getObjectContent());
-            res.add(content);
-        });
+            JSONParser parser = new JSONParser();
+            try {
+                JSONObject obj = (JSONObject) parser.parse(content);
+                jsonArray.add(obj);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
 
-        return '[' + res.toString() + ']';
+        return jsonArray;
     }
 }

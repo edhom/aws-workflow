@@ -2,28 +2,49 @@ package Project;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import org.json.simple.JSONArray;
 
-import java.util.List;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-import static java.lang.StrictMath.abs;
+import java.awt.*;
+import java.util.Map;
 
-public class f3_CalcProfit implements RequestHandler<String, String > {
+import static java.lang.Math.abs;
+
+
+public class f3_CalcProfit implements RequestHandler<JSONObject, JSONObject> {
     @Override
-    public String handleRequest(String input, Context context) {
-        List<Integer> coordinates = StringToIntegerList.buildIntegerArray(input);
+    public JSONObject handleRequest(JSONObject input, Context context) {
 
         Double pricePerKilometer = 2.00;
 
-        int x = abs(coordinates.get(0) - coordinates.get(2));
-        int y = abs(coordinates.get(1) - coordinates.get(3));
+        String a = input.toJSONString();
+        JSONParser parser = new JSONParser();
+        JSONObject obj;
+        try {
+            obj = (JSONObject) parser.parse(a);
+            JSONObject coordinatesA = (JSONObject) obj.get("A");
+            Integer aX = Integer.parseInt(coordinatesA.get("x").toString());
+            Integer aY = Integer.parseInt(coordinatesA.get("y").toString());
 
-        Double totalPrice = (x + y) * pricePerKilometer;
+            JSONObject coordinatesB = (JSONObject) obj.get("B");
+            Integer bX = Integer.parseInt(coordinatesB.get("x").toString());
+            Integer bY = Integer.parseInt(coordinatesB.get("y").toString());
 
-        StringBuilder sb = new StringBuilder(input);
 
-        sb.deleteCharAt(input.length()-1);
-        sb.append(",(" + totalPrice + "))");
+            Integer x = abs(aX - bX);
+            Integer y = abs(aY - bY);
 
-        return sb.toString();
+            Double totalPrice = (x + y) * pricePerKilometer;
+
+            obj.put("Profit", totalPrice);
+            return obj;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

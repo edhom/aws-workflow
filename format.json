@@ -1,0 +1,18 @@
+{
+  "A": {
+    "x": null,
+    "y": null
+  },
+  "B": {
+    "x": null,
+    "y": null
+  },
+  "Overhead": null,
+  "OptimalPickUp": {
+    "x": null,
+    "y": null,
+    "inMinutes": null
+  },
+  "Profit": null,
+  "OverheadinTime": null
+}

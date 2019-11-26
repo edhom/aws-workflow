@@ -17,7 +17,7 @@ import java.util.List;
 
 public class f1_RideRequest implements RequestHandler<Void, JSONArray> {
     @SuppressWarnings("Duplicates")
-    private String bucketName = "ride.offer.geiger";
+    private String bucketName = "dhom-distributedsystems-rideoffer";
 
     AmazonS3 s3client = AmazonS3ClientBuilder
             .standard()

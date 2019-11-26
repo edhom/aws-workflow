@@ -1,0 +1,26 @@
+{
+  "StartAt": "f1_RideRequest",
+  "States": {
+    "f1_RideRequest": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-central-1:916243316505:function:f1_RideRequest",
+      "OutputPath": "$",
+      "Next": "ParallelFor"
+    },
+    "ParallelFor": {
+      "Type": "Map",
+      "InputPath": "$",
+      "Iterator": {
+        "StartAt": "f2_CheckMatches",
+        "States": {
+          "f2_CheckMatches": {
+            "Type": "Task",
+            "Resource": "arn:aws:lambda:eu-central-1:916243316505:function:f2_checkMatches",
+            "End": true
+          }
+        }
+      },
+      "End": true
+    }
+  }
+}

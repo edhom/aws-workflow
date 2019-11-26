@@ -14,7 +14,7 @@ import javax.mail.internet.*;
 import javax.activation.*;
 
 public class f9_InformDriver implements RequestHandler<JSONObject, String> {
-    private String bucketName = "ride.offer.geiger";
+    private String bucketName = "dhom-distributedsystems-rideoffer";
 
     AmazonS3 s3client = AmazonS3ClientBuilder
             .standard()

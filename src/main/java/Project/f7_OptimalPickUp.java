@@ -13,7 +13,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class f7_OptimalPickUp implements RequestHandler<JSONObject, JSONObject> {
-    String bucketName = "ride.offer.geiger";
+    String bucketName = "dhom-distributedsystems-rideoffer";
 
     AmazonS3 s3client = AmazonS3ClientBuilder
             .standard()

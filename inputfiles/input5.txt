@@ -1,11 +1,11 @@
 {
   "A": {
-    "x": null,
-    "y": null
+    "x": 3,
+    "y": 1
   },
   "B": {
-    "x": null,
-    "y": null
+    "x": 11,
+    "y": 3
   },
   "Profit": null,
   "Overhead": null,

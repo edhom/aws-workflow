@@ -27,7 +27,7 @@ public class f7_OptimalPickUp implements RequestHandler<JSONObject, JSONObject> 
         String a = input.toJSONString();
         JSONParser parserRequest = new JSONParser();
 
-        S3Object object = s3client.getObject(new GetObjectRequest(bucketName, "driver.txt"));
+        S3Object object = s3client.getObject(new GetObjectRequest(bucketName, "driver.json"));
         String content = GeneralUtils.getStringFromInputStream(object.getObjectContent());
         JSONParser parserDriver = new JSONParser();
         try {

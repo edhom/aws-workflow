@@ -1,19 +1,67 @@
 {
-  "StartAt": "Validate-All",
+  "StartAt": "f1_RideRequest",
   "States": {
-    "Validate-All": {
-    "Type": "Map",
-    "Iterator": {
-      "StartAt": "Fibonacci",
-      "States": {
-         "Fibonacci": {
-         "Type": "Task",
-	     "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:Fibonacci",
-         "End": true
+    "f1_RideRequest": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-central-1:916243316505:function:f1_RideRequest",
+      "OutputPath": "$",
+      "Next": "ParallelFor"
+    },
+    "ParallelFor": {
+      "Type": "Map",
+      "InputPath": "$",
+      "Iterator": {
+        "StartAt": "f2_CheckMatches",
+        "States": {
+          "f2_CheckMatches": {
+            "Type": "Task",
+            "Resource": "arn:aws:lambda:eu-central-1:916243316505:function:f2_checkMatches",
+            "ResultPath": "$.matching",
+            "Next": "IsMatch"
+          },
+          "IsMatch": {
+            "Type" : "Choice",
+            "Choices": [
+              {
+                "Variable": "$.matching",
+                "BooleanEquals  ": true,
+                "Next": "CalculateParallel"
+              },
+              {
+                "Variable": "$.matching",
+                "BooleanEquals ": false,
+                "End": true
+              }
+            ]
+          },
+          "CalculateParallel": {
+            "Type": "Parllel",
+            "Branches": [
+              {
+                "StartAt": "Add",
+                "States": {
+                  "Add": {
+                    "Type": "Task",
+                    "Resource": "arn:aws:swf:us-east-1:123456789012:task:Add",
+                    "End": true
+                  }
+                }
+              },
+              {
+                "StartAt": "Subtract",
+                "States": {
+                  "Subtract": {
+                    "Type": "Task",
+                    "Resource": "arn:aws:swf:us-east-1:123456789012:task:Subtract",
+                    "End": true
+                  }
+                }
+              }
+            ]
           }
+        },
+        "End": true
       }
-   },
-   "End": true
-   }
+    }
   }
 }

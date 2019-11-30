@@ -1,10 +1,9 @@
- --problem bei check match output wird weitergeleitet also true aber wir brauchen request
- {
+{
   "StartAt": "f1_RideRequest",
   "States": {
     "f1_RideRequest": {
       "Type": "Task",
-      "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f1_RideRequest",
+      "Resource": "arn:aws:lambda:eu-central-1:916243316505:function:f1_RideRequest",
       "Next": "ParallelFor"
     },
     "ParallelFor": {
@@ -15,94 +14,84 @@
         "States": {
           "f2_CheckMatches": {
             "Type": "Task",
-            "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f2_checkMatches",
+            "Resource": "arn:aws:lambda:eu-central-1:916243316505:function:f2_checkMatches",
+            "ResultPath": "$.match",
             "Next": "IsMatch"
           },
-         "IsMatch": {
-          "Type": "Choice",
-          "Choices": [
+          "IsMatch": {
+            "Type": "Choice",
+            "Choices": [
               {
-                  "Variable": "$",
-                  "BooleanEquals": true,
-                  "Next": "Parallel_f3_f4_f5"
+                "Variable": "$.match",
+                "BooleanEquals": true,
+                "Next": "f3_CalcProfit"
 
-             }
-          ],
-          "Default": "Parallel_f3_f4_f5"
-        },
-          "Parallel_f3_f4_f5": {
-            "Type": "Parallel",
-            "End": true,
-            "Branches": [
-              {
-               "StartAt": "f3_CalcProfit",
-               "States": {
-                 "f3_CalcProfit": {
-                   "Type": "Task",
-                   "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f3_CalcProfit",
-                   "End": true
-                 }
-               }
-             },
-             {
-               "StartAt": "f4_calculateOverheadKM",
-               "States": {
-                 "f4_calculateOverheadKM": {
-                   "Type": "Task",
-                   "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f4_calculateOverheadKM",
-                   "Next": "f5_OverheadInTime"
-                 },
-                 "f5_OverheadInTime": {
-                   "Type": "Task",
-                   "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f5_OverheadInTime",
-                   "End": true
-                 }
-               }
-             }
-            ]
+              }
+            ],
+            "Default": "Finish"
+          },
+          "Finish": {
+            "Type": "Pass",
+            "End": true
+          },
+          "f3_CalcProfit": {
+            "Type": "Task",
+            "Resource": "arn:aws:lambda:eu-central-1:916243316505:function:f3_CalcProfit",
+            "Next": "f4_calculateOverheadKM"
+          },
+          "f4_calculateOverheadKM": {
+            "Type": "Task",
+            "Resource": "arn:aws:lambda:eu-central-1:916243316505:function:f4_calculateOverheadKM",
+            "Next": "f5_OverheadInTime"
+          },
+          "f5_OverheadInTime": {
+            "Type": "Task",
+            "Resource": "arn:aws:lambda:eu-central-1:916243316505:function:f5_OverheadInTime",
+            "End": true
           }
         }
       }
     },
     "f6_optimalRideRequest": {
       "Type": "Task",
-      "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f6_optimalRideRequest",
+      "Resource": "arn:aws:lambda:eu-central-1:916243316505:function:f6_optimalRideRequest",
       "Next": "f7_OptimalPickUp"
     },
     "f7_OptimalPickUp": {
       "Type": "Task",
-      "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f7_OptimalPickUp",
+      "Resource": "arn:aws:lambda:eu-central-1:916243316505:function:f7_OptimalPickUp",
       "Next": "Parallel_f8_f9"
     },
     "Parallel_f8_f9": {
-            "Type": "Parallel",
-            "Next": "f10_logDatabase",
-            "Branches": [
-              {
-               "StartAt": "f8_informPassenger",
-               "States": {
-                 "f8_informPassenger": {
-                   "Type": "Task",
-                   "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f8_informPassenger",
-                   "End": true
-                 }
-               }
-             },
-             {
-               "StartAt": "f9_informDriver",
-               "States": {
-                 "f9_informDriver": {
-                   "Type": "Task",
-                   "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f9_InformDriver",
-                   "End": true
-                 }
-               }
-             }
-            ]
-          },
-     "f10_logDatabase": {
+      "Type": "Parallel",
+      "ResultPath": "$.massage",
+      "Next": "f10_logDatabase",
+      "Branches": [
+        {
+          "StartAt": "f8_informPassenger",
+          "States": {
+            "f8_informPassenger": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:eu-central-1:916243316505:function:f8_informPassenger",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "f9_informDriver",
+          "States": {
+            "f9_informDriver": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:eu-central-1:916243316505:function:f9_InformDriver",
+              "End": true
+            }
+          }
+        }
+      ]
+    },
+    "f10_logDatabase": {
       "Type": "Task",
-      "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f10_logInDatabase",
+      "Resource": "arn:aws:lambda:eu-central-1:916243316505:function:f10_logInDatabase",
       "End": true
     }
   }

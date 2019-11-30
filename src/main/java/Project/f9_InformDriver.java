@@ -31,8 +31,8 @@ public class f9_InformDriver implements RequestHandler<JSONObject, String> {
             JSONObject obj = (JSONObject) parser.parse(a);
             JSONObject optimalPickUp = (JSONObject) obj.get("OptimalPickUp");
 
-            String message = "Time (in minutes): " + optimalPickUp.get("inMinutes") + "Location coordinates: "
-                    + "(" + optimalPickUp.get("x") + "," + optimalPickUp.get("y") + ")";
+            String message = "Pickup in " + optimalPickUp.get("inMinutes") + " minutes at Location: (" + optimalPickUp.get("x") + "," + optimalPickUp.get("y") + ")";
+
 
             s3client.putObject(bucketName, "InformationDriver.txt", message);
             sendEmail(message);

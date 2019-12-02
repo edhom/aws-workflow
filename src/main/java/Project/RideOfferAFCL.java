@@ -9,7 +9,7 @@ import com.dps.afcl.functions.objects.dataflow.DataInsDataFlow;
 import com.dps.afcl.utils.Utils;
 import java.util.Arrays;
 
-public class gateChangeAlert {
+public class RideOfferAFCL {
     @SuppressWarnings("Duplicates")
     public static void main(String[] args) {
 
@@ -116,7 +116,7 @@ public class gateChangeAlert {
         workflow.setWorkflowBody(Arrays.asList(f1_rideRequest, parallelFor, f6_optimalRideRequest, f7_optimalPickUp, parallelF8F9, f10_logDatabase));
 
         // Validate workflow and write as YAML
-        Utils.writeYaml(workflow, "gateChangeAlert.yaml", path);
+        Utils.writeYaml(workflow, "RideOfferAFCL.yaml", path);
 
         //Utils.readYAML("gateChangeAlert.yaml", )
     }

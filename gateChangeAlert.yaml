@@ -7,6 +7,8 @@ workflowBody:
     dataOuts:
     - name: "OutVal1"
       type: "collection"
+    - name: "numRequests"
+      type: "number"
 - parallelFor:
     name: "parallelForRideRequest"
     dataIns:
@@ -17,12 +19,12 @@ workflowBody:
         type: "BLOCK"
         size:
           type: "SINGLE"
-          value: "5"
+          value: "1"
     loopCounter:
       name: "counter"
       type: "number"
       from: "0"
-      to: "22"
+      to: "f1_rideRequest/numRequests"
     loopBody:
     - function:
         name: "f2_checkMatch"
@@ -79,7 +81,7 @@ workflowBody:
           source: "f3_calcProfit/OutVal4, f5_calcOverheadInTime/OutVal6"
     dataOuts:
     - name: "OutVal9"
-      type: "collection"
+      type: "request"
       source: "parallelF3F4/OutVal7"
 - function:
     name: "f6_optimalRideRequest"

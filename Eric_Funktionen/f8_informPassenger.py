@@ -6,7 +6,7 @@ def lambda_handler(event, context):
     encoded_string = message.encode("utf-8")
 
     bucket_name = "dhom-distributedsystems-rideoffer"
-    s3_path = "passengerInfo.txt"
+    s3_path = "InformationPassenger.txt"
     s3 = boto3.resource("s3")
     s3.Bucket(bucket_name).put_object(Key=s3_path, Body=encoded_string)
     return "Passenger informed!"

@@ -47,6 +47,6 @@ public class f1_RideRequest implements RequestHandler<Void, JSONArray> {
             }
         }
 
-        return jsonArray;
+        return jsonArray.size() == 0 ? null : jsonArray;
     }
 }

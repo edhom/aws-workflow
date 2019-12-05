@@ -1,0 +1,20 @@
+private String getUserDataNormalNode() {
+	String userData = "";
+	userData += "#!/bin/bash\n";
+	userData += "echo \"#!/bin/bash\nyum -y update\nsudo yum -y install gcc make\ncd /usr/local/src \nsudo wget http://download.redis.io/redis-stable.tar.gz\nsudo tar xvzf redis-stable.tar.gz\nsudo rm -f redis-stable.tar.gz\ncd redis-stable\nsudo make distclean\nsudo make\nsudo yum install -y tcl\nsudo cp src/redis-server /usr/local/bin/\nsudo cp src/redis-cli /usr/local/bin/\nsudo cp src/redis-benchmark /usr/local/bin\" >> /home/ec2-user/setup_node.sh\n";
+	userData += "chown ec2-user:ec2-user /home/ec2-user/setup_node.sh\n";
+	userData += "chmod +x /home/ec2-user/setup_node.sh\n";
+	userData += "/home/ec2-user/setup_node.sh\n";
+	userData += "/usr/local/bin/redis-server\n";
+	return encodeBase64(userData);
+}
+
+private String encodeBase64(String input) {
+	String base64UserData = null;
+	try {
+		base64UserData = new String(Base64.encodeBase64(input.getBytes("UTF-8")), "UTF-8");
+	} catch (UnsupportedEncodingException uee) {
+		System.out.println(uee.getMessage());
+	}
+	return base64UserData;
+}

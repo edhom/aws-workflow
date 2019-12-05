@@ -178,7 +178,8 @@ public class EC2Utils {
                 .withMinCount(1)
                 .withMaxCount(1)
                 .withKeyName(keyPairName)
-                .withSecurityGroups(securityGroupName);
+                .withSecurityGroups(securityGroupName)
+                .withUserData(GeneralUtils.getUserDataNormalNode());
 
 
         RunInstancesResult runInstancesResult = null;

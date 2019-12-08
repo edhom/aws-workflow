@@ -169,7 +169,7 @@ public class EC2Utils {
         return authorizeSecurityGroupIngressResult;
     }
 
-    public static RunInstancesResult runInstance(AmazonEC2Client ec2Client, String imageID, String instanceType, String keyPairName, String securityGroupName) {
+    public static RunInstancesResult runInstance(AmazonEC2Client ec2Client, String imageID, String instanceType, String keyPairName, String securityGroupName, String userData) {
         RunInstancesRequest runInstancesRequest =
                 new RunInstancesRequest();
 
@@ -179,7 +179,7 @@ public class EC2Utils {
                 .withMaxCount(1)
                 .withKeyName(keyPairName)
                 .withSecurityGroups(securityGroupName)
-                .withUserData(GeneralUtils.getUserDataNormalNode());
+                .withUserData(userData);
 
 
         RunInstancesResult runInstancesResult = null;
@@ -248,6 +248,7 @@ public class EC2Utils {
         System.out.println("Retrieving public IP and DNS for Instance (ID:" + instanceID + ")...");
         String publicDNS = "";
         String publicIP = "";
+        String  privateIP = "";
 
         List<Reservation> reservations = ec2Client.describeInstances().getReservations();
         for(Reservation r : reservations){
@@ -256,6 +257,7 @@ public class EC2Utils {
                 {
                     publicDNS = r.getInstances().get(0).getPublicDnsName();
                     publicIP = r.getInstances().get(0).getPublicIpAddress();
+                    privateIP = r.getInstances().get(0).getPrivateIpAddress();
                 }
             }
         }
@@ -263,6 +265,7 @@ public class EC2Utils {
         System.out.println("Instance IP/DNS (" + instanceID + ")");
         System.out.println(" - Public DNS: " + publicDNS);
         System.out.println(" - Public IP: " + publicIP);
+        System.out.println(" - Private IP: " + privateIP);
 
         HashMap<String, String> dnsIP = new HashMap<String, String>();
 
@@ -270,6 +273,7 @@ public class EC2Utils {
         dnsIP.put("DNS", publicDNS);
         dnsIP.put("ip", publicIP);
         dnsIP.put("dns", publicDNS);
+        dnsIP.put("privIP", privateIP);
 
         return dnsIP;
     }

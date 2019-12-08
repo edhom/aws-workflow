@@ -22,11 +22,11 @@ public class Ass8_main {
         ec2Client = EC2Utils.getClient();
 
         //create new key pair
-        String newKeyPairName = "KeyPair15.pem";
+        String newKeyPairName = "KeyPair16.pem";
         EC2Utils.createKeyPair(ec2Client, newKeyPairName);
 
         //create security group and add permissions
-        String newGroupName = "SecurityGroup13";
+        String newGroupName = "SecurityGroup16";
         EC2Utils.createSecurityGroup(ec2Client, newGroupName, "Security Group for Homework 02.");
 
         //allow SSH
@@ -36,8 +36,9 @@ public class Ass8_main {
         String imageID = "ami-010fae13a16763bb4";
 
         String instanceType = args[0];
+        String userData = GeneralUtils.getUserDataNormalNode();
         long launchStartTime = System.currentTimeMillis();
-        RunInstancesResult runInstancesResult = EC2Utils.runInstance(ec2Client, imageID, instanceType, newKeyPairName, newGroupName);
+        RunInstancesResult runInstancesResult = EC2Utils.runInstance(ec2Client, imageID, instanceType, newKeyPairName, newGroupName, userData);
         String instanceID = runInstancesResult.getReservation().getInstances().get(0).getInstanceId();
         //waiting for instance to be in status "running"
         EC2Utils.waitForInstanceState(ec2Client, instanceID, "running", 250, 600);

@@ -1,5 +1,8 @@
 package Homework;
 
+import Homework.EC2Utils;
+import Homework.GeneralUtils;
+import Homework.SSHUtils;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import net.schmizz.sshj.SSHClient;
@@ -36,7 +39,7 @@ public class Ass2_Task1 {
         String imageID = "ami-00aa4671cbf840d82";
         String instanceType = args[0];
         long launchStartTime = System.currentTimeMillis();
-        RunInstancesResult runInstancesResult = EC2Utils.runInstance(ec2Client, imageID, instanceType, newKeyPairName, newGroupName);
+        RunInstancesResult runInstancesResult = EC2Utils.runInstance(ec2Client, imageID, instanceType, newKeyPairName, newGroupName, null);
         String instanceID = runInstancesResult.getReservation().getInstances().get(0).getInstanceId();
         //waiting for instance to be in status "running"
         EC2Utils.waitForInstanceState(ec2Client, instanceID, "running", 250, 600);

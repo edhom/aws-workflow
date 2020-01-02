@@ -119,6 +119,7 @@ public class RideOfferAFCL {
         Utils.writeYaml(workflow, "RideOfferAFCL.yaml", path);
 
         //Utils.readYAML("gateChangeAlert.yaml", )
+        Utils.readYAML("RideOfferAFCL.yaml", path);
     }
 
 

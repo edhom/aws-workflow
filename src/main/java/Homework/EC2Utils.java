@@ -169,7 +169,7 @@ public class EC2Utils {
         return authorizeSecurityGroupIngressResult;
     }
 
-    public static RunInstancesResult runInstance(AmazonEC2Client ec2Client, String imageID, String instanceType, String keyPairName, String securityGroupName, String userData) {
+    public static RunInstancesResult runInstance(AmazonEC2Client ec2Client, String imageID, String instanceType, String keyPairName, String securityGroupName) {
         RunInstancesRequest runInstancesRequest =
                 new RunInstancesRequest();
 
@@ -179,7 +179,7 @@ public class EC2Utils {
                 .withMaxCount(1)
                 .withKeyName(keyPairName)
                 .withSecurityGroups(securityGroupName)
-                .withUserData(userData);
+                .withUserData(GeneralUtils.getUserDataNormalNode());
 
 
         RunInstancesResult runInstancesResult = null;

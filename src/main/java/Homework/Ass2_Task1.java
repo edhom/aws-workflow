@@ -34,7 +34,6 @@ public class Ass2_Task1 {
 
         //launch instance
         String imageID = "ami-00aa4671cbf840d82";
-
         String instanceType = args[0];
         long launchStartTime = System.currentTimeMillis();
         RunInstancesResult runInstancesResult = EC2Utils.runInstance(ec2Client, imageID, instanceType, newKeyPairName, newGroupName);

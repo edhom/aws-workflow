@@ -12,7 +12,6 @@ import com.dps.afcl.Function;
 import com.dps.afcl.Workflow;
 import com.dps.afcl.functions.*;
 import com.dps.afcl.functions.objects.DataIns;
-import com.dps.afcl.functions.objects.dataflow.DataInsDataFlow;
 import com.dps.afcl.utils.Utils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -22,30 +21,31 @@ import org.json.simple.parser.ParseException;
 import java.util.*;
 
 public class EngineWorkflow {
-    public static ValueStore valueStore = new ValueStore();
+
+    public static HashMap<String,String> storage = new HashMap<>();
     public static void parseWorkflow(String yamlFile){
         String path = "C:\\Users\\geige\\Documents\\3_Semester\\02_Verteilte Systeme\\distributed_systems\\src\\main\\resources\\schema.json";
         Workflow workflow = Utils.readYAML(yamlFile, path);
 
         List<Function> functions = workflow.getWorkflowBody();
 
-        executeSequence(functions, 0, "");
+        parseSequence(functions, 0);
 
         System.out.println("");
         System.out.println("");
         System.out.println("");
-        for(Map.Entry<String, String> j : valueStore.valueStore.entrySet()){
+        for(Map.Entry<String, String> j : storage.entrySet()){
             System.out.println(j.getKey() + "  " + j.getValue());
         }
     }
 
-    public static void executeSequence(List<Function> functions, Integer index, String path){
+    public static void parseSequence(List<Function> functions, Integer index){
         for(Function func : functions){
-            parseFunction(func, index, path);
+            parseFunction(func, index);
         }
     }
 
-    public static void parseFunction(Function function, Integer index, String path){
+    public static void parseFunction(Function function, Integer index){
         String type = function.getClass().toString();
 
         if(type.equals("class com.dps.afcl.functions.Parallel")){
@@ -55,7 +55,7 @@ public class EngineWorkflow {
             parseParallelFor((ParallelFor) function);
         }
         else if(type.equals("class com.dps.afcl.functions.AtomicFunction")){
-            parseAtomicFunction((AtomicFunction) function, index, path);
+            parseAtomicFunction((AtomicFunction) function, index);
         }
         else{
             System.out.println("Shouldn't be here");
@@ -63,12 +63,11 @@ public class EngineWorkflow {
     }
 
     public static void parseParallel(Parallel parallel){
-        System.out.println(parallel.getDataIns().get(0).getSource());
         List<Thread> threads = new ArrayList<>();
 
         parallel.getParallelBody().forEach(section -> {
 
-            Thread t = new Thread(() -> executeSequence(section.getSection(), 0, ""));
+            Thread t = new Thread(() -> parseSequence(section.getSection(), 0));
             threads.add(t);
             t.start();
         });
@@ -83,28 +82,29 @@ public class EngineWorkflow {
     }
 
     public static void parseParallelFor(ParallelFor parallelFor){
-        DataInsDataFlow input = parallelFor.getDataIns().get(0);
 
-        String dataValue = valueStore.getValue(input.getSource());
+        String input = storage.get(parallelFor.getDataIns().get(0).getSource());
 
-        JSONArray inputCollection = stringToJSONArray(dataValue);
-        List<Function> loopBody = parallelFor.getLoopBody();
-        Integer loopBodySize = loopBody.size();
-        String firstInputSource = inputToSource(loopBody.get(0), 0);
-        System.out.println("firstinputsource " + firstInputSource );
+        JSONArray inputArray = stringToJSONArray(input);
+        List<Function> loopFunctions = parallelFor.getLoopBody();
+        AtomicFunction atomicFunction = (AtomicFunction) loopFunctions.get(0);
+        Integer inputSize = null;
 
-        Integer to = Integer.parseInt(parallelFor.getLoopCounter().getTo());
+        if(parallelFor.getLoopCounter().getTo().equals("inputSize")){
+            inputSize = inputArray.size();
+        }
         List<Thread> threads = new ArrayList<>();
-        for (int i = 0; i < to; i += 1) {
+        for (int i = 0; i < inputSize; i += 1) {
             int finalI = i;
             Thread t = new Thread(() -> {
-                JSONObject object = (JSONObject) inputCollection.get(finalI);
-                String blockInputSource = inputToSource(loopBody.get(0), 0) + "/" + finalI;
-                //System.out.println("QQQQQQQQQQQQQQQQ"+blockInputSource);
-                valueStore.addValue(blockInputSource, collectionToJSON(object));
 
-                setInput(loopBody.get(0), Collections.singletonList(new DataIns(blockInputSource, "Collection", blockInputSource)));
-                executeSequence(loopBody, finalI, blockInputSource);
+                JSONObject object = (JSONObject) inputArray.get(finalI);
+                String part = atomicFunction.getName() + "/" + atomicFunction.getDataIns().get(0).getName() + "/" + finalI;
+                //System.out.println("QQQQQQQQQQQQQQQQ"+blockInputSource);
+                storage.put(part, object.toJSONString());
+
+                atomicFunction.setDataIns(Arrays.asList(new DataIns(part, "Collection", part)));
+                parseSequence(loopFunctions, finalI);
 
             });
             threads.add(t);
@@ -118,18 +118,14 @@ public class EngineWorkflow {
             }
         }
 
-        System.out.println("OUTPUT"+parallelFor.getDataOuts().get(0).getSource());
-        String[] merge = new String[to];
-        for(int i = 0; i < to; i++){
-            merge[i] = valueStore.getValue(parallelFor.getDataOuts().get(0).getSource()+"/"+i);
+        String[] merge = new String[inputSize];
+        for(int i = 0; i < inputSize; i++){
+            merge[i] = storage.get(parallelFor.getDataOuts().get(0).getSource()+"/"+i);
         }
-        valueStore.addValue(parallelFor.getName()+"/"+parallelFor.getDataOuts().get(0).getName(), Arrays.toString(merge));
-        System.out.println("--------------------------------");
-        System.out.println(Arrays.toString(merge));
-        System.out.println("--------------------------------");
+        storage.put(parallelFor.getName()+"/"+parallelFor.getDataOuts().get(0).getName(), Arrays.toString(merge));
     }
 
-    public static void parseAtomicFunction(AtomicFunction atomicFunction, Integer index, String path){
+    public static void parseAtomicFunction(AtomicFunction atomicFunction, Integer index){
         Integer i = 0;
         String jsonInput = null;
 
@@ -137,24 +133,24 @@ public class EngineWorkflow {
 
         //jsonInput = valueStore.valueStore.get(path);
         if(atomicFunction.getName().equals("f2_checkMatches") || atomicFunction.getName().equals("f6_optimalRideRequest")){
-            jsonInput = valueStore.valueStore.get(atomicFunction.getDataIns().get(0).getSource());
+            jsonInput = storage.get(atomicFunction.getDataIns().get(0).getSource());
         }
 
-        else if(atomicFunction.getName().equals("f3_CalcProfit") || atomicFunction.getName().equals("f4_calculateOverheadKM") || atomicFunction.getName().equals("f5_OverheadInTime") || atomicFunction.getName().equals("f7_OptimalPickUp")|| atomicFunction.getName().equals("f8_informPassenger") || atomicFunction.getName().equals("f9_InformDriver") || atomicFunction.getName().equals("f10_logInDatabase")){
+        else if(!atomicFunction.getName().equals("f1_RideRequest")){
             //System.out.println("f333333333333333333"+atomicFunction.getDataIns().get(0).getSource());
-            jsonInput = valueStore.getValue(atomicFunction.getDataIns().get(0).getSource()+"/"+ index);
+            jsonInput = storage.get(atomicFunction.getDataIns().get(0).getSource()+"/"+ index);
         }
 
-        System.out.println("[" + atomicFunction.getName() + "] input: " + jsonInput);
+        //System.out.println("[" + atomicFunction.getName() + "] input: " + jsonInput);
         String output = invokeFunction(atomicFunction.getName(), jsonInput);
-        System.out.println("[" + atomicFunction.getName() + "] output: " + output);
+        //System.out.println("[" + atomicFunction.getName() + "] output: " + output);
 
         String outputName = atomicFunction.getDataOuts().get(0).getName();
         if(!atomicFunction.getName().equals("f1_RideRequest")) {
-            valueStore.addValue(atomicFunction.getName() + "/" + outputName + "/" + index, output);
+            storage.put(atomicFunction.getName() + "/" + outputName + "/" + index, output);
         }
         else{
-            valueStore.addValue(atomicFunction.getName() + "/" + outputName, output);
+            storage.put(atomicFunction.getName() + "/" + outputName, output);
         }
         i++;
     }
@@ -188,38 +184,6 @@ public class EngineWorkflow {
             e.printStackTrace();
         }
         return null;
-    }
-
-
-    private static void setInput(Function function, List<DataIns> input) {
-        if (function instanceof AtomicFunction) {
-            AtomicFunction f = (AtomicFunction) function;
-            f.setDataIns(input);
-        } else if (function instanceof CompoundSequential) {
-            CompoundSequential f = (CompoundSequential) function;
-            f.setDataIns(input);
-        } else {
-            System.err.println("Not supported");
-        }
-    }
-
-    private static String inputToSource(Function function, int index) {
-        if (function instanceof AtomicFunction) {
-            AtomicFunction atomicFunction = (AtomicFunction) function;
-            return atomicFunction.getName() + "/" + atomicFunction.getDataIns().get(index).getName();
-        } else if (function instanceof CompoundSequential) {
-            CompoundSequential compoundSequential = (CompoundSequential) function;
-            return compoundSequential.getName() + "/" + compoundSequential.getDataIns().get(index).getName();
-        } else if (function instanceof CompoundParallel) {
-            CompoundParallel compoundParallel = (CompoundParallel) function;
-            return compoundParallel.getName() + "/" + compoundParallel.getDataIns().get(index).getName();
-        }
-        System.err.println("Not supported");
-        return null;
-    }
-
-    public static String collectionToJSON(JSONObject input) {
-        return input.toJSONString();
     }
 
 }

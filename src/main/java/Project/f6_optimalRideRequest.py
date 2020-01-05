@@ -4,9 +4,12 @@ def score(req):
     return req['Profit'] - req['Overhead'] * 0.30 - req['OverheadInTime'] * 10
 
 def lambda_handler(requests, context):
+
+    if requests == [{'isEmpty': True}]:
+        return requests
     
-    matchingReqs = list(filter(lambda req: req['match'] == True, requests))
-    
+    matchingReqs = list(filter(lambda req: req['isMatch'] == True, requests))
+
     if len(matchingReqs) > 0:
         optimalMatch = matchingReqs[0]
         for req in matchingReqs:

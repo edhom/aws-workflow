@@ -21,6 +21,10 @@ public class f3_CalcProfit implements RequestHandler<JSONObject, JSONObject> {
         Double pricePerKilometer = 2.00;
 
         String a = input.toJSONString();
+
+        if(a.equals("{\"isEmpty\":true}") || input.get("isMatch").equals(false)){
+            return input;
+        }
         JSONParser parser = new JSONParser();
         JSONObject obj;
         try {

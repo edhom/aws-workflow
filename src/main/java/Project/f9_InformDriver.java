@@ -11,10 +11,9 @@ import org.json.simple.parser.ParseException;
 import java.util.*;
 import javax.mail.*;
 import javax.mail.internet.*;
-import javax.activation.*;
 
 public class f9_InformDriver implements RequestHandler<JSONObject, String> {
-    private String bucketName = "dhom-distributedsystems-rideoffer";
+    private String bucketName = "ride.offer.geiger";
 
     AmazonS3 s3client = AmazonS3ClientBuilder
             .standard()
@@ -25,64 +24,34 @@ public class f9_InformDriver implements RequestHandler<JSONObject, String> {
     @Override
     public String handleRequest(JSONObject input, Context context) {
 
-        String a = input.toJSONString();
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject obj = (JSONObject) parser.parse(a);
-            JSONObject optimalPickUp = (JSONObject) obj.get("OptimalPickUp");
+        String message = "";
 
-            String message = "Pickup in " + optimalPickUp.get("inMinutes") + " minutes at Location: (" + optimalPickUp.get("x") + "," + optimalPickUp.get("y") + ")";
-
-
-            s3client.putObject(bucketName, "InformationDriver.txt", message);
-            sendEmail(message);
-            return message;
-        } catch (ParseException e) {
-            e.printStackTrace();
+        if(input == null){
+            message = "Can not find a proper request";
         }
-        return null;
-    }
 
-    public void sendEmail(String text){
-        // Recipient's email ID needs to be mentioned.
-        String to = "laura.geiger@student.uibk.ac.at";
+        else{
+            String a = input.toJSONString();
+            JSONParser parser = new JSONParser();
 
-        // Sender's email ID needs to be mentioned
-        String from = "lauraxgeiger@icloud.com";
 
-        // Assuming you are sending email from localhost
-        String host = "localhost";
+            if(a.equals("{\"isEmpty\":true}")){
+                message = "Can not find any requests";
+            }
 
-        // Get system properties
-        Properties properties = System.getProperties();
+            try {
+                JSONObject obj = (JSONObject) parser.parse(a);
+                JSONObject optimalPickUp = (JSONObject) obj.get("OptimalPickUp");
 
-        // Setup mail server
-        properties.setProperty("mail.smtp.host", host);
+                message = "Pickup in " + optimalPickUp.get("inMinutes") + " minutes at Location: (" + optimalPickUp.get("x") + "," + optimalPickUp.get("y") + ")";
 
-        // Get the default Session object.
-        Session session = Session.getDefaultInstance(properties);
-
-        try {
-            // Create a default MimeMessage object.
-            MimeMessage message = new MimeMessage(session);
-
-            // Set From: header field of the header.
-            message.setFrom(new InternetAddress(from));
-
-            // Set To: header field of the header.
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-
-            // Set Subject: header field
-            message.setSubject("Ride App new Passenger");
-
-            // Now set the actual message
-            message.setText(text);
-
-            // Send message
-            Transport.send(message);
-            System.out.println("Sent message successfully....");
-        } catch (MessagingException mex) {
-            mex.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
+
+
+        s3client.putObject(bucketName, "InformationDriver.txt", message);
+        return "Driver informed!";
     }
 }

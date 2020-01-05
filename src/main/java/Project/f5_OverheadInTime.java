@@ -12,10 +12,15 @@ public class f5_OverheadInTime implements RequestHandler<JSONObject, JSONObject>
         String a = input.toJSONString();
         JSONParser parserRequest = new JSONParser();
 
+        if(a.equals("{\"isEmpty\":true}")  || input.get("isMatch").equals(false)){
+            return input;
+        }
+
         try {
+            Double avgSpeed = 50.0;
             JSONObject obj = (JSONObject) parserRequest.parse(a);
             Integer overhead = Integer.parseInt(obj.get("Overhead").toString());
-            Double overheadInTime = overhead/50.0;
+            Double overheadInTime = overhead/avgSpeed;
             obj.put("OverheadInTime", overheadInTime);
 
             return obj;

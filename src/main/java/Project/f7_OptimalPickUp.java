@@ -13,7 +13,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class f7_OptimalPickUp implements RequestHandler<JSONObject, JSONObject> {
-    String bucketName = "dhom-distributedsystems-rideoffer";
+    String bucketName = "ride.offer.geiger";
 
     AmazonS3 s3client = AmazonS3ClientBuilder
             .standard()
@@ -24,8 +24,16 @@ public class f7_OptimalPickUp implements RequestHandler<JSONObject, JSONObject> 
     @Override
     public JSONObject handleRequest(JSONObject input, Context context) {
 
+        if(input == null){
+            return input;
+        }
+
         String a = input.toJSONString();
         JSONParser parserRequest = new JSONParser();
+
+        if(a.equals("{\"isEmpty\":true}")){
+            return input;
+        }
 
         S3Object object = s3client.getObject(new GetObjectRequest(bucketName, "driver.json"));
         String content = GeneralUtils.getStringFromInputStream(object.getObjectContent());

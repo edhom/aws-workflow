@@ -4,11 +4,11 @@ import boto3
 def lambda_handler(event, context):
 
     message = ""
-    if event[0] == {'isEmpty': True}:
-        message = "Can not find any requests"
-
-    elif event is None:
+    if event is None:
         message = "Can not find a proper request"
+
+    elif event[0] == {'isEmpty': True}:
+        message = "Can not find any requests"
 
     else:
         message = "Pickup in " + str(event['OptimalPickUp']['inMinutes']) + " minutes at Location: (" + str(event['OptimalPickUp']['x']) + ", " + str(event['OptimalPickUp']['y']) + ")"

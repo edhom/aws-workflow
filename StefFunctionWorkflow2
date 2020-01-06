@@ -47,7 +47,6 @@
     },
     "Parallel_f8_f9": {
       "Type": "Parallel",
-      "ResultPath": "$.massage",
       "Next": "f10_logDatabase",
       "Branches": [
         {

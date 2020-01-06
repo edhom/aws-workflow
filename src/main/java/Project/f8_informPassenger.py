@@ -4,7 +4,7 @@ import boto3
 def lambda_handler(event, context):
 
     message = ""
-    if event == {'isEmpty': True}:
+    if event[0] == {'isEmpty': True}:
         message = "Can not find any requests"
 
     elif event is None:

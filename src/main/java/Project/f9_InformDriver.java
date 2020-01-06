@@ -17,7 +17,7 @@ public class f9_InformDriver implements RequestHandler<JSONObject, String> {
 
     AmazonS3 s3client = AmazonS3ClientBuilder
             .standard()
-            .withRegion(Regions.EU_CENTRAL_1)
+            .withRegion("eu-central-1")
             .build();
 
 
@@ -35,7 +35,7 @@ public class f9_InformDriver implements RequestHandler<JSONObject, String> {
             JSONParser parser = new JSONParser();
 
 
-            if(a.equals("{\"isEmpty\":true}")){
+            if(a.equals("[{\"isEmpty\":true}]")){
                 message = "Can not find any requests";
             }
 

@@ -31,7 +31,7 @@ public class f7_OptimalPickUp implements RequestHandler<JSONObject, JSONObject> 
         String a = input.toJSONString();
         JSONParser parserRequest = new JSONParser();
 
-        if(a.equals("{\"isEmpty\":true}")){
+        if(a.equals("[{\"isEmpty\":true}]")){
             return input;
         }
 

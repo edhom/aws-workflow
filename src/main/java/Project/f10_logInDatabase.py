@@ -6,7 +6,7 @@ def lambda_handler(event, context):
     if event is None:
         encoded_string = "Can not find any match"
 
-    elif event == {'isEmpty': True}:
+    elif event[0] == {'isEmpty': True}:
         encoded_string = "No requests found"
 
     else:

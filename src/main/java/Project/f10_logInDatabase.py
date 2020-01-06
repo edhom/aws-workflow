@@ -2,7 +2,15 @@ import json
 import boto3
 
 def lambda_handler(event, context):
-    encoded_string = json.dumps(event, indent=4).encode("utf-8")
+
+    if event is None:
+        encoded_string = "Can not find any match"
+
+    elif event[0] == {'isEmpty': True}:
+        encoded_string = "No requests found"
+
+    else:
+        encoded_string = json.dumps(event, indent=4).encode("utf-8")
 
     bucket_name = "dhom-distributedsystems-rideoffer"
     s3_path = "log.txt"

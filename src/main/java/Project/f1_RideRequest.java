@@ -17,7 +17,7 @@ import java.util.List;
 
 public class f1_RideRequest implements RequestHandler<Void, JSONArray> {
     @SuppressWarnings("Duplicates")
-    private String bucketName = "dhom-distributedsystems-rideoffer";
+    private String bucketName = "ride.offer.geiger";
 
     AmazonS3 s3client = AmazonS3ClientBuilder
             .standard()
@@ -35,18 +35,26 @@ public class f1_RideRequest implements RequestHandler<Void, JSONArray> {
             summaries.addAll (listing.getObjectSummaries());
         }
 
+        if(summaries.size() == 0){
+            JSONObject object = new JSONObject();
+            object.put("isEmpty", true);
+            jsonArray.add(object);
+        }
+
         for(S3ObjectSummary file : summaries){
             S3Object object = s3client.getObject(new GetObjectRequest(bucketName, file.getKey()));
             String content = GeneralUtils.getStringFromInputStream(object.getObjectContent());
             JSONParser parser = new JSONParser();
             try {
                 JSONObject obj = (JSONObject) parser.parse(content);
+                obj.put("isEmpty", false);
                 jsonArray.add(obj);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+
         }
 
-        return jsonArray.size() == 0 ? null : jsonArray;
+        return jsonArray;
     }
 }

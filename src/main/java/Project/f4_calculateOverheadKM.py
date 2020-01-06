@@ -12,6 +12,10 @@ def distance(A, B):
     return abs(A['x'] - B['x']) + abs(A['y'] - B['y'])
 
 def lambda_handler(request, context):
+
+    if request == {'isEmpty': True} or request['isMatch'] == False:
+        return request
+
     driver = getDriver()
     
     A = driver['A']

@@ -9,6 +9,9 @@ def getDriver():
     return driver
     
 def lambda_handler(request, context):
+
+    if request == {'isEmpty': True}:
+        return request
     
     driver = getDriver()
     
@@ -25,6 +28,8 @@ def lambda_handler(request, context):
         and A['x'] <= C['x'] and C['x'] - 10 <= D['x'] 
         and avgY + 10 >= C['y'] and avgY - 5 <= C['y'] 
     ):
-        return True
+        request['isMatch'] = True
     else:
-        return False
+        request['isMatch'] = False
+
+    return request

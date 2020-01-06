@@ -1,0 +1,136 @@
+---
+name: "RideOffer"
+workflowBody:
+- function:
+    name: "f1_RideRequest"
+    type: "Function"
+    dataOuts:
+    - name: "OutVal1"
+      type: "Collection"
+    - name: "NumRequests"
+      type: "ArrayLength"
+- parallelFor:
+    name: "parallelFor"
+    dataIns:
+    - name: "OutVal1"
+      type: "Collection"
+      source: "f1_RideRequest/OutVal1"
+      dataFlow:
+        type: "BLOCK"
+        size:
+          type: "SINGLE"
+          value: "1"
+    loopCounter:
+      name: "Counter"
+      type: "Counter"
+      from: "0"
+      to: "inputSize"
+      step: "1"
+    loopBody:
+    - function:
+        name: "f2_checkMatches"
+        type: "Function"
+        dataIns:
+        - name: "InVal3"
+          type: "Request"
+          source: "parallelFor/OutVal1"
+        dataOuts:
+        - name: "OutVal3"
+          type: "Request"
+    - function:
+        name: "f3_CalcProfit"
+        type: "Function"
+        dataIns:
+        - name: "InVal4"
+          type: "Request"
+          source: "f2_checkMatches/OutVal3"
+        dataOuts:
+        - name: "OutVal4"
+          type: "Request"
+    - function:
+        name: "f4_calculateOverheadKM"
+        type: "Function"
+        dataIns:
+        - name: "InVal5"
+          type: "Request"
+          source: "f3_CalcProfit/OutVal4"
+        dataOuts:
+        - name: "OutVal5"
+          type: "Request"
+    - function:
+        name: "f5_OverheadInTime"
+        type: "Function"
+        dataIns:
+        - name: "InVal6"
+          type: "Request"
+          source: "f4_calculateOverheadKM/OutVal5"
+        dataOuts:
+        - name: "OutVal6"
+          type: "Request"
+    dataOuts:
+    - name: "OutVal9"
+      type: "Collection"
+      source: "f5_OverheadInTime/OutVal6"
+- function:
+    name: "f6_optimalRideRequest"
+    type: "Function"
+    dataIns:
+    - name: "InVal7"
+      type: "Collection"
+      source: "parallelFor/OutVal9"
+    dataOuts:
+    - name: "OutVal7"
+      type: "Request"
+- function:
+    name: "f7_OptimalPickUp"
+    type: "Function"
+    dataIns:
+    - name: "InVal8"
+      type: "Request"
+      source: "f6_optimalRideRequest/OutVal7"
+    dataOuts:
+    - name: "OutVal8"
+      type: "Request"
+- parallel:
+    name: "parallelF8F9"
+    dataIns:
+    - name: "InVal9"
+      type: "Request"
+      source: "f7_OptimalPickUp/OutVal8"
+    parallelBody:
+    - section:
+      - function:
+          name: "f8_informPassenger"
+          type: "Function"
+          dataIns:
+          - name: "InVal9"
+            type: "Request"
+            source: "f7_OptimalPickUp/OutVal8"
+          dataOuts:
+          - name: "OutVal9"
+            type: "Boolean"
+    - section:
+      - function:
+          name: "f9_InformDriver"
+          type: "Function"
+          dataIns:
+          - name: "InVal9"
+            type: "Request"
+            source: "f7_OptimalPickUp/OutVal8"
+          dataOuts:
+          - name: "OutVal10"
+            type: "Boolean"
+    dataOuts:
+    - name: "OutVal14"
+      type: "Request"
+      source: "f8_informPassenger/OutVal9, f9_InformDriver/OutVal10"
+- function:
+    name: "f10_logInDatabase"
+    type: "f10_logDatabaseType"
+    dataIns:
+    - name: "InVal9"
+      type: "Request"
+      source: "f7_OptimalPickUp/OutVal8"
+    dataOuts:
+    - name: "OutVal11"
+      type: "String"

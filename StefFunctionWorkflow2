@@ -1,0 +1,80 @@
+{
+  "StartAt": "f1_RideRequest",
+  "States": {
+    "f1_RideRequest": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f1_RideRequest",
+      "Next": "ParallelFor"
+    },
+    "ParallelFor": {
+      "Type": "Map",
+      "Next": "f6_optimalRideRequest",
+      "Iterator": {
+        "StartAt": "f2_CheckMatches",
+        "States": {
+          "f2_CheckMatches": {
+            "Type": "Task",
+            "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f2_checkMatches",
+            "Next": "f3_CalcProfit"
+          },
+          "f3_CalcProfit": {
+            "Type": "Task",
+            "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f3_CalcProfit",
+            "Next": "f4_calculateOverheadKM"
+          },
+          "f4_calculateOverheadKM": {
+            "Type": "Task",
+            "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f4_calculateOverheadKM",
+            "Next": "f5_OverheadInTime"
+          },
+          "f5_OverheadInTime": {
+            "Type": "Task",
+            "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f5_OverheadInTime",
+            "End": true
+          }
+        }
+      }
+    },
+    "f6_optimalRideRequest": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f6_optimalRideRequest",
+      "Next": "f7_OptimalPickUp"
+    },
+    "f7_OptimalPickUp": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f7_OptimalPickUp",
+      "Next": "Parallel_f8_f9"
+    },
+    "Parallel_f8_f9": {
+      "Type": "Parallel",
+      "Next": "f10_logDatabase",
+      "Branches": [
+        {
+          "StartAt": "f8_informPassenger",
+          "States": {
+            "f8_informPassenger": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f8_informPassenger",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "f9_informDriver",
+          "States": {
+            "f9_informDriver": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f9_InformDriver",
+              "End": true
+            }
+          }
+        }
+      ]
+    },
+    "f10_logDatabase": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:eu-central-1:229168435243:function:f10_logInDatabase",
+      "End": true
+    }
+  }
+}

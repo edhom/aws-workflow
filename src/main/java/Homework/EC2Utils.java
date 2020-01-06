@@ -145,22 +145,25 @@ public class EC2Utils {
     public static AuthorizeSecurityGroupIngressResult addRuleToSecurityGroup(AmazonEC2Client ec2Client, String groupName, String ipRangeString, int fromPort, int toPort, String protocol) {
         IpPermission ipPermission = new IpPermission();
 
-        IPRange ipRange = new IPRange().withCIDRIP(ipRangeString);
+        IpRange ip_range = new IpRange().withCidrIp("0.0.0.0/0");
+        Ipv6Range ipv6_range = new Ipv6Range().withCidrIpv6("::/0");
 
-        ipPermission.withIpRanges(ipRangeString)
+        IpPermission ip_perm = new IpPermission()
                 .withIpProtocol(protocol)
-                .withFromPort(fromPort)
-                .withToPort(toPort);
+                .withToPort(fromPort)
+                .withFromPort(toPort)
+                .withIpv4Ranges(ip_range)
+                .withIpv6Ranges(ipv6_range);
 
         AuthorizeSecurityGroupIngressRequest authorizeSecurityGroupIngressRequest = new AuthorizeSecurityGroupIngressRequest();
 
         authorizeSecurityGroupIngressRequest.withGroupName(groupName)
-                .withIpPermissions(ipPermission);
+                .withIpPermissions(ip_perm);
 
         AuthorizeSecurityGroupIngressResult authorizeSecurityGroupIngressResult = null;
         try {
             authorizeSecurityGroupIngressResult = ec2Client.authorizeSecurityGroupIngress(authorizeSecurityGroupIngressRequest);
-            System.out.println("Permission (iprange:" + ipRangeString + ";from:" + fromPort + ";to:" + toPort + ";" + protocol + ") successfully added to group '" + groupName + "'...");
+            System.out.println("Permission (iprange:" + "0.0.0.0/0" + "; from:" + fromPort + "; to:" + toPort + "; " + protocol + ") successfully added to group '" + groupName + "'...");
         }
         catch (AmazonEC2Exception e) {
             System.out.println(e.getErrorMessage());
@@ -169,7 +172,7 @@ public class EC2Utils {
         return authorizeSecurityGroupIngressResult;
     }
 
-    public static RunInstancesResult runInstance(AmazonEC2Client ec2Client, String imageID, String instanceType, String keyPairName, String securityGroupName) {
+    public static RunInstancesResult runInstance(AmazonEC2Client ec2Client, String imageID, String instanceType, String keyPairName, String securityGroupName, String userData) {
         RunInstancesRequest runInstancesRequest =
                 new RunInstancesRequest();
 
@@ -179,7 +182,7 @@ public class EC2Utils {
                 .withMaxCount(1)
                 .withKeyName(keyPairName)
                 .withSecurityGroups(securityGroupName)
-                .withUserData(GeneralUtils.getUserDataNormalNode());
+                .withUserData(userData);
 
 
         RunInstancesResult runInstancesResult = null;

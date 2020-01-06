@@ -194,6 +194,23 @@ public class GeneralUtils {
         return encodeBase64(userData);
     }
 
+    public static String getUserDataClusterMode() {
+        String userData = "";
+        userData += "#!/bin/bash\n";
+        userData += "sudo sed -i -e '$i \\echo never > /sys/kernel/mm/transparent_hugepage/enabled &\\n' /etc/rc.local\n";
+        userData += "sudo sh -c \"echo never > /sys/kernel/mm/transparent_hugepage/enabled\"\n";
+        userData += "sudo sh -c \"echo 'vm.overcommit_memory = 1' >> /etc/sysctl.conf\"";
+        userData += "sudo sysctl vm.overcommit_memory=1\n";
+        userData += "echo \"protected-mode no\nport 6379\ncluster-enabled yes\ncluster-config-file nodes.conf\ncluster-node-timeout 5000\nappendonly yes\" >> /usr/local/bin/redis.conf\n";
+        userData += "echo \"#!/bin/bash\nyum -y update\nsudo yum -y install gcc make\ncd /usr/local/src \nsudo wget http://download.redis.io/redis-stable.tar.gz\nsudo tar xvzf redis-stable.tar.gz\nsudo rm -f redis-stable.tar.gz\ncd redis-stable\nsudo make distclean\nsudo make\nsudo yum install -y tcl\nsudo cp src/redis-server /usr/local/bin/\nsudo cp src/redis-cli /usr/local/bin/\nsudo cp src/redis-benchmark /usr/local/bin\" >> /home/ec2-user/setup_node.sh\n";
+        userData += "chown ec2-user:ec2-user /home/ec2-user/setup_node.sh\n";
+        userData += "chmod +x /home/ec2-user/setup_node.sh\n";
+        userData += "/home/ec2-user/setup_node.sh\n";
+        userData += "/usr/local/bin/redis-server /usr/local/bin/redis.conf\n";
+        return encodeBase64(userData);
+    }
+
+
     public static String encodeBase64(String input) {
         String base64UserData = null;
         try {

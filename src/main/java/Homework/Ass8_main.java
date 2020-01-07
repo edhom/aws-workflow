@@ -38,7 +38,7 @@ public class Ass8_main {
         String instanceType = args[0];
         String userData = GeneralUtils.getUserDataNormalNode();
         long launchStartTime = System.currentTimeMillis();
-        RunInstancesResult runInstancesResult = EC2Utils.runInstance(ec2Client, imageID, instanceType, newKeyPairName, newGroupName);
+        RunInstancesResult runInstancesResult = EC2Utils.runInstance(ec2Client, imageID, instanceType, newKeyPairName, newGroupName, null);
         String instanceID = runInstancesResult.getReservation().getInstances().get(0).getInstanceId();
         //waiting for instance to be in status "running"
         EC2Utils.waitForInstanceState(ec2Client, instanceID, "running", 250, 600);

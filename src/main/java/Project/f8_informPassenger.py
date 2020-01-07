@@ -7,7 +7,7 @@ def lambda_handler(event, context):
     if event is None:
         message = "Can not find a proper request"
 
-    elif event[0] == {'isEmpty': True}:
+    elif event == [{'isEmpty': True}]:
         message = "Can not find any requests"
 
     else:

@@ -2,6 +2,7 @@ package Homework;
 
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
+import com.amazonaws.services.ec2.model.transform.ReservedInstancesIdStaxUnmarshaller;
 import net.schmizz.sshj.SSHClient;
 
 import java.io.IOException;
@@ -23,11 +24,11 @@ public class Ass9_redis {
         ec2Client = EC2Utils.getClient();
 
         //create new key pair
-        String newKeyPairName = "KeyPair29.pem";
+        String newKeyPairName = "KeyPair30.pem";
         EC2Utils.createKeyPair(ec2Client, newKeyPairName);
 
         //create security group and add permissions
-        String newGroupName = "SecurityGroup29";
+        String newGroupName = "SecurityGroup30";
         EC2Utils.createSecurityGroup(ec2Client, newGroupName, "Security Group for Homework 02.");
 
         //allow SSH
@@ -55,10 +56,13 @@ public class Ass9_redis {
         for (int i = 0; i < 6; i++) {
             //waiting for instance i to be in status "running"
             EC2Utils.waitForInstanceState(ec2Client, instanceIDs.get(i), "running", 250, 600);
-
             //Get public DNS and IP
             System.out.println("I'm node " + i + " and this is my address...");
             publicDNSIP.add(EC2Utils.getPublicIPandDNS(ec2Client, instanceIDs.get(i)));
+        }
+
+        for (int i = 0; i < 6; i++) {
+            EC2Utils.waitForInitialization(ec2Client, instanceIDs.get(i));
         }
 
         // Create cluster
@@ -73,6 +77,7 @@ public class Ass9_redis {
         System.out.println(createCluster);
 
         SSHUtils.executeCMD(sshClient, createCluster, 600);
+        SSHUtils.executeCMD(sshClient, "yes", 600);
 
         System.out.println("\n---------------------------");
         System.out.println("Finished Cluster Creation - TIME MEASUREMENTS");

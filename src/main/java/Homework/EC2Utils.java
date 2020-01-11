@@ -248,11 +248,12 @@ public class EC2Utils {
 
     public static void waitForInitialization(AmazonEC2Client ec2Client, String instanceID) throws InterruptedException {
         DescribeInstanceStatusRequest instanceStatusRequest = new DescribeInstanceStatusRequest().withInstanceIds(instanceID);
-        DescribeInstanceStatusResult instanceStatusResult = ec2Client.describeInstanceStatus(instanceStatusRequest);
+        DescribeInstanceStatusResult instanceStatusResult;
 
-        while (instanceStatusResult.getInstanceStatuses().get(0).getInstanceStatus().getStatus().equals("initializing")) {
+        do {
             Thread.sleep(500);
-        }
+            instanceStatusResult = ec2Client.describeInstanceStatus(instanceStatusRequest);
+        } while (instanceStatusResult.getInstanceStatuses().get(0).getInstanceStatus().getStatus().equals("initializing"));
     }
 
     public static HashMap<String, String> getPublicIPandDNS(AmazonEC2Client ec2Client, String instanceID){

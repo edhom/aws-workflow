@@ -197,6 +197,7 @@ public class GeneralUtils {
     public static String getUserDataClusterMode() {
         String userData = "";
         userData += "#!/bin/bash\n";
+        userData += "sudo service awslogs stop\n";
         userData += "sudo sed -i -e '$i \\echo never > /sys/kernel/mm/transparent_hugepage/enabled &\\n' /etc/rc.local\n";
         userData += "sudo sh -c \"echo never > /sys/kernel/mm/transparent_hugepage/enabled\"\n";
         userData += "sudo sh -c \"echo 'vm.overcommit_memory = 1' >> /etc/sysctl.conf\"";

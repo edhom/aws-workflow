@@ -24,11 +24,11 @@ public class Ass9_redis {
         ec2Client = EC2Utils.getClient();
 
         //create new key pair
-        String newKeyPairName = "KeyPair30.pem";
+        String newKeyPairName = "KeyPair32.pem";
         EC2Utils.createKeyPair(ec2Client, newKeyPairName);
 
         //create security group and add permissions
-        String newGroupName = "SecurityGroup30";
+        String newGroupName = "SecurityGroup32";
         EC2Utils.createSecurityGroup(ec2Client, newGroupName, "Security Group for Homework 02.");
 
         //allow SSH

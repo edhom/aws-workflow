@@ -27,6 +27,14 @@ public class EngineWorkflowRedis {
 
     public static RedisHashMap storage;
 
+    public static void initializeStorage(String dns) {
+        storage = new RedisHashMap(dns);
+    }
+
+    public static void freeStorage() {
+        storage.close();
+    }
+
     //public static HashMap<String,String> storage = new HashMap<>();
     public static void parseWorkflow(String yamlFile) throws ParseException {
         String path = "C:\\Users\\geige\\Documents\\3_Semester\\02_Verteilte Systeme\\distributed_systems\\src\\main\\resources\\schema.json";
@@ -38,9 +46,11 @@ public class EngineWorkflowRedis {
         parseSequence(functions, 0);
 
         System.out.println("");System.out.println("---------------- Function inputs and outputs ----------------");System.out.println("");
-        for(Map.Entry<String, String> j : storage.entrySet()){
-            System.out.println(j.getKey() + "  " + j.getValue());
+
+        for(String j : storage.getKeys()){
+            System.out.println(j + "  " + storage.get(j));
         }
+
         System.out.println("");System.out.println("---------------- Finished ----------------");System.out.println("");
 
     }

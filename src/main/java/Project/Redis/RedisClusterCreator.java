@@ -13,9 +13,9 @@ import java.util.HashMap;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 
-public class RedisEngineMain {
+public class RedisClusterCreator {
     @SuppressWarnings("Duplicates")
-    public static void main(String[] args) throws InterruptedException, IOException {
+    public static String create() throws InterruptedException, IOException {
 
         System.out.println("Retrieving public client IP from checkip.amazonaws.com...");
         String publicClientIP = GeneralUtils.getPublicIP();
@@ -42,7 +42,7 @@ public class RedisEngineMain {
         //launch instance
         String imageID = "ami-010fae13a16763bb4";
 
-        String instanceType = args[0];
+        String instanceType = "t2.micro";
 
         ArrayList<String> instanceIDs = new ArrayList<>();
         ArrayList<HashMap<String, String>> publicDNSIP = new ArrayList<>();
@@ -86,7 +86,10 @@ public class RedisEngineMain {
 
         SSHUtils.executeCMD(sshClient, createCluster, 30);
 
+        sshClient.close();
+
         System.out.println("\n---------------------------");
         System.out.println("Finished Cluster Creation. Have fun!");
+        return publicDNSIP.get(0).get("DNS") + ":6379";
     }
 }

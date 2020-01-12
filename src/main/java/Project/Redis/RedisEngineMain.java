@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringJoiner;
+import java.util.concurrent.TimeUnit;
 
 public class RedisEngineMain {
     @SuppressWarnings("Duplicates")
@@ -24,11 +25,11 @@ public class RedisEngineMain {
         ec2Client = EC2Utils.getClient();
 
         //create new key pair
-        String newKeyPairName = "KeyPair30.pem";
+        String newKeyPairName = "KeyPair43.pem";
         EC2Utils.createKeyPair(ec2Client, newKeyPairName);
 
         //create security group and add permissions
-        String newGroupName = "SecurityGroup30";
+        String newGroupName = "SecurityGroup43";
         EC2Utils.createSecurityGroup(ec2Client, newGroupName, "Security Group for Homework 02.");
 
         //allow SSH
@@ -61,8 +62,16 @@ public class RedisEngineMain {
             publicDNSIP.add(EC2Utils.getPublicIPandDNS(ec2Client, instanceIDs.get(i)));
         }
 
+        System.out.println("Waiting for initialization...");
         for (int i = 0; i < 6; i++) {
             EC2Utils.waitForInitialization(ec2Client, instanceIDs.get(i));
+            System.out.println("Instance " + i + " initialized.");
+        }
+
+        System.out.println("Cluster creation in...");
+        for (int i = 60; i > 0; i--) {
+            System.out.println(i);
+            TimeUnit.SECONDS.sleep(1);
         }
 
         // Create cluster
@@ -73,15 +82,11 @@ public class RedisEngineMain {
             nodesJoiner.add(publicDNSIP.get(i).get("IP"));
         }
 
-        String createCluster = "redis-cli --cluster create " + nodesJoiner.toString() + ":6379 --cluster-replicas 1";
-        System.out.println(createCluster);
+        String createCluster = "(sleep 5; echo yes;) | redis-cli --cluster create " + nodesJoiner.toString() + ":6379 --cluster-replicas 1 | sleep 30";
 
-        SSHUtils.executeCMD(sshClient, createCluster, 600);
-        SSHUtils.executeCMD(sshClient, "yes", 600);
-
-
+        SSHUtils.executeCMD(sshClient, createCluster, 30);
 
         System.out.println("\n---------------------------");
-        System.out.println("Finished Cluster Creation - TIME MEASUREMENTS");
+        System.out.println("Finished Cluster Creation. Have fun!");
     }
 }

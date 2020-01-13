@@ -1,37 +1,39 @@
 package Project.Redis;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import io.lettuce.core.*;
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.sync.RedisCommands;
+import java.util.List;
+import io.lettuce.core.cluster.RedisClusterClient;
+import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
+import io.lettuce.core.cluster.api.sync.RedisAdvancedClusterCommands;
 
+public class RedisHashMap {
 
-public abstract class RedisHashMap implements Map<String, String> {
-
-
-    private RedisClient redisClient;
-    private StatefulRedisConnection<String, String> connection;
-    private RedisCommands<String, String> syncCommands;
+    private RedisClusterClient redisClient;
+    private StatefulRedisClusterConnection<String, String> connection;
+    private RedisAdvancedClusterCommands<String, String> syncCommands;
 
     public RedisHashMap(String connectionString){
-        redisClient = RedisClient.create(connectionString);
+        String uri = "redis://" + connectionString;
+        redisClient = RedisClusterClient.create(uri);
         connection = redisClient.connect();
         syncCommands = connection.sync();
+        System.out.println("Redis Client creation successful");
     }
 
-    @Override
     public String get(Object key) {
         return syncCommands.get((String) key);
     }
 
-    @Override
     public String put(String key, String value) {
         return syncCommands.set(key, value);
     }
 
+    public List<String> getKeys() {
+        return syncCommands.keys("*");
+    }
 
+    public void close() {
+        connection.close();
+        redisClient.shutdown();
+    }
 
 }

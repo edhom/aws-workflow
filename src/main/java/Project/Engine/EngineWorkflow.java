@@ -22,7 +22,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 
 public class EngineWorkflow {
-
+    @SuppressWarnings("Duplicates")
     public static HashMap<String,String> storage = new HashMap<>();
     public static void parseWorkflow(String yamlFile) throws ParseException {
         String path = "C:\\Users\\geige\\Documents\\3_Semester\\02_Verteilte Systeme\\distributed_systems\\src\\main\\resources\\schema.json";

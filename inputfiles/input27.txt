@@ -5,7 +5,7 @@
   },
   "B": {
     "x": 19,
-    "y": 3
+    "y": 66
   },
   "Profit": null,
   "Overhead": null,

@@ -5,7 +5,10 @@ def score(req):
 
 def lambda_handler(requests, context):
 
-    if requests == [{'isEmpty': True}]:
+    if requests is None:
+        return requests
+
+    elif requests == [{'isEmpty': True}]:
         return requests
     
     matchingReqs = list(filter(lambda req: req['isMatch'] == True, requests))

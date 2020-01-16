@@ -23,6 +23,7 @@ import org.json.simple.parser.ParseException;
 import java.nio.charset.Charset;
 import java.util.*;
 
+@SuppressWarnings("Duplicates")
 public class EngineWorkflowRedis {
 
     public static RedisHashMap storage;
@@ -44,15 +45,6 @@ public class EngineWorkflowRedis {
 
         System.out.println("");System.out.println("---------------- Parsing the workflow ----------------");System.out.println("");
         parseSequence(functions, 0);
-
-        System.out.println("");System.out.println("---------------- Function inputs and outputs ----------------");System.out.println("");
-
-        for(String j : storage.getKeys()){
-            System.out.println(j + "  " + storage.get(j));
-        }
-
-        System.out.println("");System.out.println("---------------- Finished ----------------");System.out.println("");
-
     }
 
     public static void parseSequence(List<Function> functions, Integer index) throws ParseException {

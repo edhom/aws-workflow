@@ -25,11 +25,11 @@ public class RedisClusterCreator {
         ec2Client = EC2Utils.getClient();
 
         //create new key pair
-        String newKeyPairName = "KeyPair43.pem";
+        String newKeyPairName = "KeyPair67.pem";
         EC2Utils.createKeyPair(ec2Client, newKeyPairName);
 
         //create security group and add permissions
-        String newGroupName = "SecurityGroup43";
+        String newGroupName = "SecurityGroup67";
         EC2Utils.createSecurityGroup(ec2Client, newGroupName, "Security Group for Homework 02.");
 
         //allow SSH

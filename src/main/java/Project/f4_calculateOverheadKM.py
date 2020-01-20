@@ -3,7 +3,7 @@ import boto3
 
 def getDriver():
     s3 = boto3.resource('s3')
-    content_object = s3.Object('dhom-distributedsystems-rideoffer', 'driver.json')
+    content_object = s3.Object('ride.offer.dhom', 'driver.json')
     file_content = content_object.get()['Body'].read().decode('utf-8')
     driver = json.loads(file_content)
     return driver

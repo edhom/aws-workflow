@@ -12,7 +12,7 @@ def lambda_handler(event, context):
     else:
         encoded_string = json.dumps(event, indent=4).encode("utf-8")
 
-    bucket_name = "dhom-distributedsystems-rideoffer"
+    bucket_name = "ride.offer.dhom"
 
     s3_path = "log.txt"
     s3 = boto3.resource("s3")

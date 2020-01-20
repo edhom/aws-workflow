@@ -7,6 +7,9 @@ import org.apache.commons.codec.binary.Base64;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -193,7 +196,7 @@ public class GeneralUtils {
         userData += "/usr/local/bin/redis-server\n";
         return encodeBase64(userData);
     }
-
+/*
     public static String getUserDataClusterMode() {
         String userData = "";
         userData += "#!/bin/bash\n";
@@ -210,6 +213,29 @@ public class GeneralUtils {
         userData += "/usr/local/bin/redis-server /usr/local/bin/redis.conf\n";
         return encodeBase64(userData);
     }
+*/
+    public static String getUserDataClusterMode() {
+        String userData = "";
+        userData += "#!/bin/bash\n";
+        userData += "echo \"#!/bin/bash\nyum -y update\nsudo yum -y install gcc make\ncd /usr/local/src \nsudo wget http://download.redis.io/redis-stable.tar.gz\nsudo tar xvzf redis-stable.tar.gz\nsudo rm -f redis-stable.tar.gz\ncd redis-stable\nsudo make distclean\nsudo make\nsudo yum install -y tcl\nsudo cp src/redis-server /usr/local/bin/\nsudo cp src/redis-cli /usr/local/bin/\n\" >> /home/ec2-user/setup_node.sh\n";
+        userData += "echo \"" +
+                "port 6379\n" +
+                "cluster-enabled yes\n" +
+                "cluster-config-file nodes.conf\n" +
+                "cluster-node-timeout 5000\n" +
+                "appendonly yes\n" +
+                "cluster-announce-ip \"$(curl -s http://checkip.amazonaws.com)\"\n" +
+                "requirepass \"supersecret\"\n" +
+                "masterauth \"supersecret\"\"" +
+                " >> /home/ec2-user/redis-cluster.cfg\n";
+        userData += "chown ec2-user:ec2-user /home/ec2-user/setup_node.sh\n";
+        userData += "chown ec2-user:ec2-user /home/ec2-user/redis-cluster.cfg\n";
+        userData += "chmod +x /home/ec2-user/setup_node.sh\n";
+        userData += "chmod +x /home/ec2-user/redis-cluster.cfg\n";
+        userData += "/home/ec2-user/setup_node.sh\n";
+        userData += "/usr/local/bin/redis-server /home/ec2-user/redis-cluster.cfg\n";
+        return encodeBase64(userData);
+    }
 
 
     public static String encodeBase64(String input) {
@@ -220,6 +246,29 @@ public class GeneralUtils {
             System.out.println(uee.getMessage());
         }
         return base64UserData;
+    }
+
+    public static String readClusterDNS(String filename) {
+        String clusterDNS = "";
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(filename));
+            clusterDNS = br.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return clusterDNS;
+    }
+
+    public static void writeClusterDNS(String filename, String clusterDNS) {
+        File dnsFile = new File(filename);
+        try {
+            FileWriter fw = new FileWriter(dnsFile, false);
+            fw.write(clusterDNS);
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

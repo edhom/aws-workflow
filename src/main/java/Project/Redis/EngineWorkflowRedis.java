@@ -38,7 +38,7 @@ public class EngineWorkflowRedis {
 
     //public static HashMap<String,String> storage = new HashMap<>();
     public static void parseWorkflow(String yamlFile) throws ParseException {
-        String path = "C:\\Users\\geige\\Documents\\3_Semester\\02_Verteilte Systeme\\distributed_systems\\src\\main\\resources\\schema.json";
+        String path = "/Users/ericdhom/Desktop/Uni/Semester3/VerteilteSysteme/Repo/src/main/resources/schema.json";
         Workflow workflow = Utils.readYAML(yamlFile, path);
 
         List<Function> functions = workflow.getWorkflowBody();

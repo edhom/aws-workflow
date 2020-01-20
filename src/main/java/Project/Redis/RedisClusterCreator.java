@@ -7,6 +7,8 @@ import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import net.schmizz.sshj.SSHClient;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 public class RedisClusterCreator {
     @SuppressWarnings("Duplicates")
-    public static String create() throws InterruptedException, IOException {
+    public static void main(String[] args) throws InterruptedException, IOException {
 
         System.out.println("Retrieving public client IP from checkip.amazonaws.com...");
         String publicClientIP = GeneralUtils.getPublicIP();
@@ -25,11 +27,11 @@ public class RedisClusterCreator {
         ec2Client = EC2Utils.getClient();
 
         //create new key pair
-        String newKeyPairName = "KeyPair67.pem";
+        String newKeyPairName = "KeyPair79.pem";
         EC2Utils.createKeyPair(ec2Client, newKeyPairName);
 
         //create security group and add permissions
-        String newGroupName = "SecurityGroup67";
+        String newGroupName = "SecurityGroup79";
         EC2Utils.createSecurityGroup(ec2Client, newGroupName, "Security Group for Homework 02.");
 
         //allow SSH
@@ -69,7 +71,7 @@ public class RedisClusterCreator {
         }
 
         System.out.println("Cluster creation in...");
-        for (int i = 60; i > 0; i--) {
+        for (int i = 30; i > 0; i--) {
             System.out.println(i);
             TimeUnit.SECONDS.sleep(1);
         }
@@ -82,7 +84,7 @@ public class RedisClusterCreator {
             nodesJoiner.add(publicDNSIP.get(i).get("IP"));
         }
 
-        String createCluster = "(sleep 5; echo yes;) | redis-cli --cluster create " + nodesJoiner.toString() + ":6379 --cluster-replicas 1 | sleep 30";
+        String createCluster = "(sleep 5; echo yes;) | redis-cli -a supersecret --cluster create " + nodesJoiner.toString() + ":6379 --cluster-replicas 1 | sleep 30";
 
         SSHUtils.executeCMD(sshClient, createCluster, 30);
 
@@ -90,6 +92,7 @@ public class RedisClusterCreator {
 
         System.out.println("\n---------------------------");
         System.out.println("Finished Cluster Creation. Have fun!");
-        return publicDNSIP.get(0).get("DNS") + ":6379";
+
+        GeneralUtils.writeClusterDNS("clusterDNS.txt", publicDNSIP.get(0).get("DNS") + ":6379");
     }
 }

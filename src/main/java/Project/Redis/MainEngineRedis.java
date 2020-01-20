@@ -1,5 +1,6 @@
 package Project.Redis;
 
+import Homework.GeneralUtils;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
@@ -7,17 +8,13 @@ import java.io.IOException;
 public class MainEngineRedis {
     @SuppressWarnings("Duplicates")
     public static void main(String[] args) throws ParseException {
-        String redisDNS = "";
-        try {
-            redisDNS = RedisClusterCreator.create();
-        } catch(IOException | InterruptedException e) {
-            System.err.println("Cluster creation failed");
-        }
+        String redisDNS = GeneralUtils.readClusterDNS("clusterDNS.txt");
+
         EngineWorkflowRedis.initializeStorage(redisDNS);
         long engine1Start = System.currentTimeMillis();
         EngineWorkflowRedis.parseWorkflow("RideOfferAFCL2.yaml");
         long engine1End = System.currentTimeMillis() - engine1Start;
-
+/*
         long engine2Start = System.currentTimeMillis();
         EngineWorkflowRedis.parseWorkflow("RideOfferAFCL2.yaml");
         long engine2End = System.currentTimeMillis() - engine2Start;
@@ -39,5 +36,7 @@ public class MainEngineRedis {
         System.out.println("Engine3: " + engine3End);
         System.out.println("Engine4: " + engine4End);
         System.out.println("Engine5: " + engine5End);
+
+ */
     }
 }
